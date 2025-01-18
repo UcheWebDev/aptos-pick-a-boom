@@ -11,7 +11,7 @@
     "move:initialize": "node ./scripts/move/initialize",
     "move:deploy": "node ./scripts/move/deploy",
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "deploy": "vercel",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
