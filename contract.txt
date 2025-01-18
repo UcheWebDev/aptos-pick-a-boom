@@ -1,0 +1,206 @@
+module message_board_addr::stake_contract {
+    use std::signer;
+    use std::vector;
+    use aptos_framework::coin;
+    use aptos_framework::aptos_coin::AptosCoin;
+    use aptos_framework::timestamp;
+    use aptos_framework::event::{Self, EventHandle};
+    use aptos_framework::object::{Self, Object, ExtendRef};
+    use aptos_framework::account;
+
+    const BOARD_OBJECT_SEED: vector<u8> = b"BOARD_OBJECT";
+
+    const E_STAKE_NOT_FOUND: u64 = 1;
+    const E_STAKE_ALREADY_PAIRED: u64 = 2;
+    const E_INSUFFICIENT_BALANCE: u64 = 3;
+    const E_NOT_AUTHORIZED: u64 = 5;
+
+    const STATUS_PENDING: u8 = 0;
+    const STATUS_PAIRED: u8 = 1;
+    const STATUS_COMPLETED: u8 = 2;
+
+    struct StakeRequest has key {
+        staker: address,
+        opponent: address,
+        amount: u64,
+        status: u8,
+        created_at: u64,
+    }
+
+    struct BoardObjectController has key {
+        extend_ref: ExtendRef,
+    }
+
+    struct StakeStore has key {
+        stakes: vector<Object<StakeRequest>>,
+        stake_created_events: EventHandle<StakeCreatedEvent>,
+        stake_paired_events: EventHandle<StakePairedEvent>,
+        stake_completed_events: EventHandle<StakeCompletedEvent>
+    }
+
+    struct StakeCreatedEvent has drop, store {
+        stake_id: address,
+        staker: address,
+        amount: u64,
+        created_at: u64
+    }
+
+    struct StakePairedEvent has drop, store {
+        stake_id: address,
+        staker: address,
+        opponent: address,
+        amount: u64
+    }
+
+    struct StakeCompletedEvent has drop, store {
+        stake_id: address,
+        winner: address,
+        reward_amount: u64
+    }
+
+    fun init_module(sender: &signer) {
+        let constructor_ref = &object::create_named_object(sender, BOARD_OBJECT_SEED);
+
+        let board_signer = &object::generate_signer(constructor_ref);
+        move_to(board_signer, BoardObjectController {
+            extend_ref: object::generate_extend_ref(constructor_ref),
+        });
+    }
+
+    public entry fun create_stake(account: &signer, amount: u64) acquires StakeStore,BoardObjectController {
+        let sender_addr = signer::address_of(account);
+        assert!(coin::balance<AptosCoin>(sender_addr) >= amount, E_INSUFFICIENT_BALANCE);
+        
+        let board_object = get_board_object();
+        let board_addr = object::object_address(&board_object);
+
+        // Initialize StakeStore if it doesn't exist
+        if (!exists<StakeStore>(board_addr)) {
+            let board_signer = object::generate_signer_for_extending(&borrow_global<BoardObjectController>(board_addr).extend_ref);
+            move_to(&board_signer, StakeStore {
+                stakes: vector::empty(),
+                stake_created_events: account::new_event_handle(&board_signer),
+                stake_paired_events: account::new_event_handle(&board_signer),
+                stake_completed_events: account::new_event_handle(&board_signer)
+            });
+        };
+
+        coin::transfer<AptosCoin>(account, board_addr, amount);
+        
+        let constructor_ref = object::create_object(sender_addr);
+        let stake_signer = object::generate_signer(&constructor_ref);
+        let stake = StakeRequest {
+            staker: sender_addr,
+            opponent: @0x0,
+            amount,
+            status: STATUS_PENDING,
+            created_at: timestamp::now_seconds(),
+        };
+        move_to(&stake_signer, stake);
+        
+        let stake_addr = object::address_from_constructor_ref(&constructor_ref);
+        let store_mut = borrow_global_mut<StakeStore>(board_addr);
+        
+        event::emit_event(&mut store_mut.stake_created_events, StakeCreatedEvent {
+            stake_id: stake_addr,
+            staker: sender_addr,
+            amount,
+            created_at: timestamp::now_seconds()
+        });
+
+        vector::push_back(&mut store_mut.stakes, object::address_to_object<StakeRequest>(stake_addr));
+    }
+
+    public entry fun pair_stake(account: &signer, stake_addr: address) acquires StakeStore, StakeRequest {
+        let sender_addr = signer::address_of(account);
+        let stake_obj = object::address_to_object<StakeRequest>(stake_addr);
+        let stake = borrow_global_mut<StakeRequest>(object::object_address(&stake_obj));
+        
+        assert!(stake.status == STATUS_PENDING, E_STAKE_ALREADY_PAIRED);
+        assert!(coin::balance<AptosCoin>(sender_addr) >= stake.amount, E_INSUFFICIENT_BALANCE);
+
+        let board_object = get_board_object();
+        coin::transfer<AptosCoin>(account, object::object_address(&board_object), stake.amount);
+
+        stake.opponent = sender_addr;
+        stake.status = STATUS_PAIRED;
+
+        let store_mut = borrow_global_mut<StakeStore>(object::object_address(&board_object));
+
+        event::emit_event(&mut store_mut.stake_paired_events, StakePairedEvent {
+            stake_id: stake_addr,
+            staker: stake.staker,
+            opponent: sender_addr,
+            amount: stake.amount
+        });
+    }
+
+    public entry fun resolve_game(
+        account: &signer,
+        stake_addr: address,
+        winner_addr: address
+    ) acquires StakeStore, StakeRequest, BoardObjectController {
+        let sender_addr = signer::address_of(account);
+        let board_object = get_board_object();
+        let board_controller = borrow_global<BoardObjectController>(object::object_address(&board_object));
+        assert!(sender_addr == object::address_from_extend_ref(&board_controller.extend_ref), E_NOT_AUTHORIZED);
+
+        let stake_obj = object::address_to_object<StakeRequest>(stake_addr);
+        let stake = borrow_global_mut<StakeRequest>(object::object_address(&stake_obj));
+        
+        assert!(stake.status == STATUS_PAIRED, E_STAKE_NOT_FOUND);
+
+        let reward_amount = stake.amount * 2;
+        let board_signer = object::generate_signer_for_extending(&board_controller.extend_ref);
+        coin::transfer<AptosCoin>(&board_signer, winner_addr, reward_amount);
+
+        stake.status = STATUS_COMPLETED;
+
+        let store_mut = borrow_global_mut<StakeStore>(object::object_address(&board_object));
+
+        event::emit_event(&mut store_mut.stake_completed_events, StakeCompletedEvent {
+            stake_id: stake_addr,
+            winner: winner_addr,
+            reward_amount
+        });
+    }
+
+    #[view]
+    public fun get_stake_info(stake_addr: address): (address, address, u64, u8) acquires StakeRequest {
+        let stake_obj = object::address_to_object<StakeRequest>(stake_addr);
+        let stake = borrow_global<StakeRequest>(object::object_address(&stake_obj));
+        (stake.staker, stake.opponent, stake.amount, stake.status)
+    }
+
+    #[view]
+    public fun get_all_stakes(): (address) acquires StakeRequest {
+        let board_object = get_board_object();
+        let store_ref = borrow_global<StakeRequest>(object::object_address(&board_object));
+        store_ref.staker
+    }
+
+    #[view]
+    public fun get_pending_stakes(): vector<Object<StakeRequest>> acquires StakeStore,StakeRequest {
+        let board_object = get_board_object();
+        let store_ref = borrow_global<StakeStore>(object::object_address(&board_object));
+        let pending_stakes = vector::empty();
+        
+        let i = 0;
+        let len = vector::length(&store_ref.stakes);
+        while (i < len) {
+            let stake_obj = *vector::borrow(&store_ref.stakes, i);
+            let stake = borrow_global<StakeRequest>(object::object_address(&stake_obj));
+            if (stake.status == STATUS_PENDING) {
+                vector::push_back(&mut pending_stakes, stake_obj);
+            };
+            i = i + 1;
+        };
+        
+        pending_stakes
+    }
+
+    fun get_board_object(): Object<BoardObjectController> {
+        let board_addr = object::create_object_address(&@message_board_addr, BOARD_OBJECT_SEED);
+        object::address_to_object<BoardObjectController>(board_addr)
+    }
+}
