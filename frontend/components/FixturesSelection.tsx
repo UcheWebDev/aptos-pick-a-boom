@@ -1,27 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Clock, Check } from "lucide-react";
 
-const FixturesSelection = ({ matches, maxAllowedSelections = 10, alreadySelectedMatches, onSelectionChange }) => {
-  const [selectedMatches, setSelectedMatches] = useState([]);
-  const [activeFilter, setActiveFilter] = useState("All"); // 'All' for no filter
+const FixturesSelection = ({
+  matches,
+  maxAllowedSelections = 10,
+  alreadySelectedMatches = [],
+  onSelectionChange,
+  currentSelection = [],
+}) => {
+  const [activeFilter, setActiveFilter] = useState("All");
 
   const handleMatchSelect = (match) => {
-    let newSelection = [...selectedMatches];
+    let newSelection = [...currentSelection];
     const matchIndex = newSelection.findIndex((m) => m.id === match.id);
 
     if (matchIndex > -1) {
-      // Remove match if already selected
       newSelection.splice(matchIndex, 1);
+    } else if (alreadySelectedMatches.some((m) => m.id === match.id)) {
+      const updatedSelection = currentSelection.filter((m) => m.id !== match.id);
+      onSelectionChange(updatedSelection, match.id);
+      return;
     } else if (newSelection.length < maxAllowedSelections) {
-      // Add match if under max allowed selections
       newSelection.push(match);
     } else {
-      // Optional: Show toast notification that max selections reached
       return;
     }
 
-    setSelectedMatches(newSelection);
-    onSelectionChange(newSelection); // Notify parent of change with new selection
+    onSelectionChange(newSelection);
   };
 
   const formatMatchTime = (timeStr) => {
@@ -34,15 +39,36 @@ const FixturesSelection = ({ matches, maxAllowedSelections = 10, alreadySelected
   };
 
   const filteredMatches = activeFilter === "All" ? matches : matches.filter((match) => match.ccode === activeFilter);
-
   const uniqueLeagues = ["All", ...new Set(matches.map((match) => match.ccode))];
+
+  const TeamLogo = ({ src, teamName }) => (
+    <div className="flex flex-col items-center gap-2">
+      <div className="w-8 h-8 rounded-full bg-gray-100 overflow-hidden">
+        {src ? (
+          <img
+            src={src}
+            alt={`${teamName} logo`}
+            className="w-full h-full object-contain p-1"
+            onError={(e) => {
+              e.target.src = "/api/placeholder/32/32";
+            }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-xs font-bold text-gray-400">
+            {teamName.charAt(0)}
+          </div>
+        )}
+      </div>
+      <p className="font-medium text-sm text-center line-clamp-2">{teamName}</p>
+    </div>
+  );
 
   return (
     <div className="space-y-4">
-      <div className="sticky top-0 bg-white p-4 border-b">
+      <div className="sticky top-0 bg-white p-4 border-b z-10">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold">Select Matches</h3>
-          <span className="text-sm text-gray-600">Selected: {selectedMatches.length}</span>
+          <span className="text-sm text-gray-600">Selected: {currentSelection.length}</span>
         </div>
 
         <div className="flex overflow-x-auto gap-2 mt-4">
@@ -64,7 +90,8 @@ const FixturesSelection = ({ matches, maxAllowedSelections = 10, alreadySelected
 
       <div className="max-h-[60vh] overflow-y-auto space-y-2 px-4">
         {filteredMatches.map((match) => {
-          const isSelected = selectedMatches.some((m) => m.id === match.id);
+          const isSelected = currentSelection.some((m) => m.id === match.id);
+          const isAlreadySelected = alreadySelectedMatches.some((m) => m.id === match.id);
 
           return (
             <div
@@ -73,31 +100,23 @@ const FixturesSelection = ({ matches, maxAllowedSelections = 10, alreadySelected
               className={`
                 relative p-4 rounded-lg border transition-all cursor-pointer
                 ${isSelected ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-blue-200"}
+                ${isAlreadySelected ? "border-blue-500 bg-blue-50" : ""}
               `}
             >
-              {isSelected && (
+              {(isSelected || isAlreadySelected) && (
                 <div className="absolute top-2 right-2">
                   <Check className="w-5 h-5 text-blue-500" />
                 </div>
               )}
 
-              <div className="text-xs font-medium text-center text-gray-500 mb-2">{match.ccode} League</div>
+              <div className="text-xs font-medium text-center text-gray-500 mb-4">{match.ccode} League</div>
 
-              <div className="grid grid-cols-3 items-center gap-2">
-                <div className="text-right">
-                  <p className="font-medium truncate">{match.homeTeam}</p>
-                </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <TeamLogo src={match.homeLogo} teamName={match.homeTeam} />
                 <div className="flex flex-col items-center justify-center">
                   <span className="text-sm font-bold text-gray-400">vs</span>
-                  {/* <div className="flex items-center text-xs text-gray-500 mt-1">
-                    <Clock className="w-3 h-3 mr-1" />
-                    
-                    {formatMatchTime(match.matchTime)}
-                  </div> */}
                 </div>
-                <div className="text-left">
-                  <p className="font-medium truncate">{match.awayTeam}</p>
-                </div>
+                <TeamLogo src={match.awayLogo} teamName={match.awayTeam} />
               </div>
             </div>
           );

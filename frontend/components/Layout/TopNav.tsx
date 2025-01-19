@@ -45,7 +45,7 @@ const TopNav: React.FC<TopNavProps> = ({ onMenuClick, onNotificationsClick }) =>
     const path = location.pathname;
 
     // Remove leading slash and capitalize first letter
-    if (path === "/") return "Home";
+    if (path === "/") return "";
 
     const title = path
       .substring(1) // Remove leading slash
@@ -53,7 +53,7 @@ const TopNav: React.FC<TopNavProps> = ({ onMenuClick, onNotificationsClick }) =>
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
       .join(" "); // Join with spaces
 
-    return title || "Home"; // Fallback to Dashboard if path is empty
+    return title || ""; // Fallback to Dashboard if path is empty
   };
 
   // Check if current page is homepage
@@ -96,9 +96,7 @@ const TopNav: React.FC<TopNavProps> = ({ onMenuClick, onNotificationsClick }) =>
             </button>
           )} */}
 
-          <button className="p-2 hover:bg-gray-100 rounded-lg">
-            <WalletSelector />
-          </button>
+          <WalletSelector />
         </div>
       </div>
     </nav>

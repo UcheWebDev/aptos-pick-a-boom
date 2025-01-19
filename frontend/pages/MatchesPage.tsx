@@ -425,7 +425,7 @@ export default function MatchBetting() {
 
       toast({
         title: "Success",
-        description: result.message + ` Transaction hash: ${executedTransaction.hash}`,
+        description: result.message,
       });
 
       // navigate(`/stake/${id}/results`);

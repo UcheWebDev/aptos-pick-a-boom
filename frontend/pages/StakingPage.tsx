@@ -27,7 +27,7 @@ import { stakeFunc } from "@/entry-functions/stakeFunc";
 import SpinButton from "@/components/SpinButton";
 import FixturesSelection from "@/components/FixturesSelection";
 
-const presetAmounts = [1, 5, 10, 15, 20];
+const presetAmounts = [1, 5, 10, 15];
 const cutPresets = [
   { label: "Cut 1", multiplier: 1, stakeMultiplier: 1.2 },
   { label: "Cut 2", multiplier: 2, stakeMultiplier: 1.5 },
@@ -45,6 +45,7 @@ export default function BettingForm() {
   const [fetchMatchesError, setFetchMatchesError] = useState(null);
   const [todaysMatches, setTodaysMatches] = useState([]);
   const [selectedMatches, setSelectedMatches] = useState([]);
+  const [currentSelectedMatches, setCurrentSelectedMatches] = useState([]); // Add this state
 
   const [isMatchesDialogOpen, setIsMatchesDialogOpen] = useState(false);
 
@@ -391,7 +392,7 @@ export default function BettingForm() {
           )}
 
           {/* Preset Amounts */}
-          <div className="grid grid-cols-5 gap-2 mt-3">
+          <div className="grid grid-cols-4 gap-2 mt-3">
             {presetAmounts.map((preset) => (
               <button
                 key={preset}
@@ -553,9 +554,9 @@ export default function BettingForm() {
           matches={todaysMatches}
           maxAllowedSelections={10}
           alreadySelectedMatches={selectedMatches}
+          currentSelection={currentSelectedMatches} // Pass the current selection
           onSelectionChange={(matches) => {
-            setSelectedMatches(matches);
-            setTotalGames(matches.length.toString()); // Automatically set total games based on selection
+            setCurrentSelectedMatches(matches); // Update the current selection
           }}
         />
         <div className="flex justify-end gap-3 mt-4 px-4 pb-4">
@@ -567,6 +568,8 @@ export default function BettingForm() {
           </button>
           <button
             onClick={() => {
+              setSelectedMatches(currentSelectedMatches); // Update the final selection only on confirm
+              setTotalGames(currentSelectedMatches.length.toString());
               setIsMatchesDialogOpen(false);
             }}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-900"
