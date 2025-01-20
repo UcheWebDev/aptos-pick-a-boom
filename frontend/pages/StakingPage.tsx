@@ -602,7 +602,7 @@ export default function BettingForm() {
               }}
             />
           </div>
-          <AlertDialogFooter className="flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 mt-4">
+          <AlertDialogFooter className="flex flex-row space-x-2 mt-4">
             <AlertDialogCancel className="w-full sm:w-1/2 mt-0">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
