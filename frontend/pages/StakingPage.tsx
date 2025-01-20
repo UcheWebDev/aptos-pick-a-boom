@@ -66,7 +66,7 @@ export default function BettingForm() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(true);
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
   const [isProcessingTransaction, setIsProcessingTransaction] = useState(false);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -587,9 +587,9 @@ export default function BettingForm() {
 
       {/* Matches Dialog */}
       <AlertDialog open={isMatchesDialogOpen} onOpenChange={setIsMatchesDialogOpen}>
-        <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-xl max-h-[100vh] sm:max-h-[100vh]">
+        <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-xl ">
           <AlertDialogHeader>
-            <AlertDialogTitle>Select Matches</AlertDialogTitle>
+            <AlertDialogTitle></AlertDialogTitle>
           </AlertDialogHeader>
           <div className="py-2 sm:py-4 overflow-y-auto">
             <FixturesSelection
