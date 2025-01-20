@@ -10,6 +10,16 @@ import {
   Aperture,
   Clock,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAptosPriceConverter } from "../hooks/useAptosPriceConverter";
 import { useAptosBalance } from "@/hooks/useAptosBalance";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
@@ -55,6 +65,10 @@ export default function BettingForm() {
   const [errors, setErrors] = useState<{ amount?: string; totalGames?: string; time?: string }>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(true);
+  const [isProcessingTransaction, setIsProcessingTransaction] = useState(false);
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const queryClient = useQueryClient();
 
@@ -189,43 +203,46 @@ export default function BettingForm() {
           setAmount(aptosAmount.toFixed(6));
         }
       }
-      setIsModalOpen(true);
+      setIsConfirmDialogOpen(true);
     }
   };
 
+  const cancelHandleConfirmBet = () => {
+    setIsConfirmDialogOpen(false);
+  };
+
   const handleConfirmBet = async () => {
-    setisLoading(true);
-    if (!account) {
-      setisLoading(false);
-      return;
-    }
+    if (!account) return;
     try {
-      const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-states`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          selected_matches: selectedMatches.map((s) => s.matchId),
-        }),
-      });
+      setisLoading(true);
+      setIsProcessingTransaction(true); // Set processing state to true
 
-      if (!response.ok) {
-        throw new Error("Failed to verify match states");
-      }
+      // const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-states`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     selected_matches: selectedMatches.map((s) => s.matchId),
+      //   }),
+      // });
 
-      const stateCheck = await response.json();
+      // if (!response.ok) {
+      //   throw new Error("Failed to verify match states");
+      // }
 
-      // If any matches are invalid (started/finished/cancelled), prevent saving
-      if (!stateCheck.valid) {
-        toast({
-          title: "Cannot Save Predictions",
-          description: `${stateCheck.invalidCount} match${stateCheck.invalidCount > 1 ? "es have" : " has"} already started or finished. Please refresh and try again.`,
-          variant: "destructive",
-        });
-        setisLoading(false);
-        return;
-      }
+      // const stateCheck = await response.json();
+
+      // if (!stateCheck.valid) {
+      //   toast({
+      //     title: "Cannot Save Predictions",
+      //     description: `${stateCheck.invalidCount} match${stateCheck.invalidCount > 1 ? "es have" : " has"} already started or finished. Please refresh and try again.`,
+      //     variant: "destructive",
+      //   });
+      //   setisLoading(false);
+      //   setIsProcessingTransaction(false);
+      //   return;
+      // }
 
       const pairId = await generateUniquePairId();
       const amountInOctas = Math.floor(parseFloat(amount) * 100000000);
@@ -258,15 +275,22 @@ export default function BettingForm() {
       });
       settxHash(executedTransaction.hash);
       setisLoading(false);
-      setIsModalOpen(false);
-      setShowSuccess(true);
+      setIsConfirmDialogOpen(false);
+      setIsSuccessDialogOpen(true);
       setAmount("");
       setTotalGames("");
       setMultiplier(1.5);
       setSelectedCutPreset(0);
     } catch (error) {
-      setisLoading(false);
       console.error(error);
+      toast({
+        title: "Error saving wager !",
+        description: `${error}`,
+        variant: "destructive",
+      });
+      setisLoading(false);
+    } finally {
+      setIsProcessingTransaction(false);
     }
   };
 
@@ -484,100 +508,115 @@ export default function BettingForm() {
       </div>
 
       {/* Confirmation Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Confirm Your Bet">
-        <div className="space-y-4">
-          <div className="border-b pb-4">
-            <div className="flex justify-between mb-2">
-              <span className="text-gray-600">Stake Amount:</span>
-              <span className="font-semibold">{formatAmount(parseFloat(amount))}</span>
+      <AlertDialog
+        open={isConfirmDialogOpen}
+        onOpenChange={(open) => {
+          // Only allow closing if not processing transaction
+          if (isProcessingTransaction) {
+            setIsConfirmDialogOpen(open);
+          }
+        }}
+      >
+        <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-md">
+          <AlertDialogHeader className="space-y-3">
+            <AlertDialogTitle className="text-center text-lg">Confirm Your Bet</AlertDialogTitle>
+            <div className="space-y-4 pt-2">
+              <div className="border-b pb-4">
+                <div className="flex justify-between mb-2 text-sm sm:text-base">
+                  <span className="text-gray-600">Stake Amount:</span>
+                  <span className="font-semibold">{formatAmount(parseFloat(amount))}</span>
+                </div>
+                <div className="flex justify-between mb-2 text-sm sm:text-base">
+                  <span className="text-gray-600">Multiplier:</span>
+                  <span className="font-semibold">{multiplier.toFixed(1)}x</span>
+                </div>
+                <div className="flex justify-between text-sm sm:text-base">
+                  <span className="text-gray-600">Potential Win:</span>
+                  <span className="font-semibold text-green-600">
+                    {formatAmount(calculatePotentialWinnings(amount))}
+                  </span>
+                </div>
+              </div>
+              <AlertDialogDescription className="text-xs sm:text-sm text-gray-600 text-center">
+                By clicking confirm, you agree to place this wager with the specified parameters.
+              </AlertDialogDescription>
             </div>
-            <div className="flex justify-between mb-2">
-              <span className="text-gray-600">Multiplier:</span>
-              <span className="font-semibold">{multiplier.toFixed(1)}x</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Potential Win:</span>
-              <span className="font-semibold text-green-600">{formatAmount(calculatePotentialWinnings(amount))}</span>
-            </div>
-          </div>
-
-          <p className="text-sm text-gray-600">
-            By clicking confirm, you agree to place this bet with the specified parameters.
-          </p>
-
-          <div className="flex space-x-3">
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 mt-4">
+            <AlertDialogCancel
+              onClick={cancelHandleConfirmBet}
+              className="w-full sm:w-1/2 mt-0"
+              disabled={isProcessingTransaction}
             >
               Cancel
-            </button>
-            <button
+            </AlertDialogCancel>
+            <AlertDialogAction
               onClick={handleConfirmBet}
-              className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-900"
+              className="w-full sm:w-1/2 bg-blue-900 text-white hover:bg-blue-800"
+              disabled={isProcessingTransaction}
             >
-              {isLoading ? <SpinButton /> : " Confirm Bet"}
-            </button>
-          </div>
-        </div>
-      </Modal>
+              {isLoading ? <SpinButton /> : "Confirm Bet"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-      {/* Success Modal */}
-      <Modal isOpen={showSuccess} onClose={() => setShowSuccess(false)}>
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="bg-green-100 p-3 rounded-full">
-              <CheckCircle className="h-12 w-12 text-green-500" />
+      {/* Success Dialog */}
+      <AlertDialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
+      <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-md">
+          <div className="text-center space-y-4">
+            <div className="flex justify-center">
+              <div className="bg-green-100 p-3 rounded-full">
+                <CheckCircle className="h-12 w-12 text-green-500" />
+              </div>
             </div>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-center">Stake placed!</AlertDialogTitle>
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mt-1 truncate" title={txHash}>
+                  Transaction hash: {truncateHash(txHash)}
+                </p>
+              </div>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction className="w-full bg-blue-900 text-white hover:bg-blue-600">Done</AlertDialogAction>
+            </AlertDialogFooter>
           </div>
-          <div>
-            <p className="text-lg font-semibold text-gray-900">Stake placed !</p>
-            <p
-              className="text-sm text-gray-600 mt-1 truncate"
-              title={txHash} // Show full hash on hover
-            >
-              Transaction hash: {truncateHash(txHash)}
-            </p>{" "}
-          </div>
-          <button
-            onClick={() => setShowSuccess(false)}
-            className="w-full px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-700"
-          >
-            Done
-          </button>
-        </div>
-      </Modal>
+        </AlertDialogContent>
+      </AlertDialog>
 
-      {/* matches Modal */}
-      <Modal isOpen={isMatchesDialogOpen} onClose={() => setIsMatchesDialogOpen(false)}>
-        <FixturesSelection
-          matches={todaysMatches}
-          maxAllowedSelections={10}
-          alreadySelectedMatches={selectedMatches}
-          currentSelection={currentSelectedMatches} // Pass the current selection
-          onSelectionChange={(matches) => {
-            setCurrentSelectedMatches(matches); // Update the current selection
-          }}
-        />
-        <div className="flex justify-end gap-3 mt-4 px-4 pb-4">
-          <button
-            onClick={() => setIsMatchesDialogOpen(false)}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() => {
-              setSelectedMatches(currentSelectedMatches); // Update the final selection only on confirm
-              setTotalGames(currentSelectedMatches.length.toString());
-              setIsMatchesDialogOpen(false);
-            }}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-900"
-          >
-            Confirm
-          </button>
-        </div>
-      </Modal>
+      {/* Matches Dialog */}
+      <AlertDialog open={isMatchesDialogOpen} onOpenChange={setIsMatchesDialogOpen}>
+        <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-xl max-h-[100vh] sm:max-h-[100vh]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Select Matches</AlertDialogTitle>
+          </AlertDialogHeader>
+          <div className="py-2 sm:py-4 overflow-y-auto">
+            <FixturesSelection
+              matches={todaysMatches}
+              maxAllowedSelections={10}
+              alreadySelectedMatches={selectedMatches}
+              currentSelection={currentSelectedMatches}
+              onSelectionChange={(matches) => {
+                setCurrentSelectedMatches(matches);
+              }}
+            />
+          </div>
+          <AlertDialogFooter className="flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 mt-4">
+            <AlertDialogCancel className="w-full sm:w-1/2 mt-0">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setSelectedMatches(currentSelectedMatches);
+                setTotalGames(currentSelectedMatches.length.toString());
+                setIsMatchesDialogOpen(false);
+              }}
+              className="w-full sm:w-1/2 bg-blue-900 text-white hover:bg-blue-800"
+            >
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

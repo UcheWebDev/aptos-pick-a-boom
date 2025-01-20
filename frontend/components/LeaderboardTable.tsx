@@ -91,12 +91,12 @@ const LeaderboardTable = ({ stakes = [] }) => {
 
   return (
     <>
-      <div className="text-xl font-bold flex items-center gap-2 mb-4 text-gray-800">Boom Kings</div>
-      <Card className="w-full shadow-sm border">
+      <div className="text-xl font-bold flex items-center gap-2 mb-4 text-gray-600">Leatherboards</div>
+      <Card className="w-full shadow-md">
         <CardContent>
           <div className="overflow-x-auto">
             {winners.length > 0 ? (
-              <table className="w-full">
+              <table className="w-full shadow-md">
                 <thead>
                   <tr className="border-b border-gray-200 text-sm text-gray-600">
                     <th className="text-left py-3 px-4">Rank</th>

@@ -51,7 +51,7 @@ const IndexPage = () => {
       <div className="space-y-8">
         <MicroBettingBanner stakes={newStakes} />
         <StakeSwiper newStakes={newStakes} activeStakes={activeStakes} isLoading={isLoading} />
-        <div className="mt-8">
+        <div className="mt-8 mb-8">
           <LeaderboardTable stakes={newStakes} />
         </div>
       </div>

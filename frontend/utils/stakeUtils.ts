@@ -42,7 +42,7 @@ export const calculateTopStakers = (stakes, MIN_APT_AMOUNT) => {
 
         // First pass: collect all stakes and total amounts
         stakes
-            .filter((stake) => Number(stake.amount) >= MIN_APT_AMOUNT)
+            .filter((stake) => Number(formatStakeAmount(stake.amount)) >= MIN_APT_AMOUNT)
             .forEach((stake) => {
                 const creator = stake.creator;
                 const amount = Number(stake.amount);

@@ -7,7 +7,7 @@ const NavItem: React.FC<MenuItem> = ({ icon: Icon, label, path }) => {
     <Link
       to={path}
       className={`flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors ${
-        location.pathname === path ? "text-dark font-semibold" : "text-gray-500 hover:bg-gray-100"
+        location.pathname === path ? "bg-gray-100 text-dark font-semibold" : "text-gray-500 hover:bg-gray-100"
       }`}
     >
       <Icon className="h-5 w-5" />

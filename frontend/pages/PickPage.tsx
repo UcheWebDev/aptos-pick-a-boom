@@ -113,10 +113,10 @@ export default function PlayPredictor() {
     <div className="">
       {/* Main Content */}
       <div className="">
-        <div className="text-left mb-10">
+        {/* <div className="text-left mb-10">
           <h1 className="text-2xl font-bold mb-2">Wager Listings</h1>
-          {/* <p className="text-gray-600">Make your predictions for a chance to win!</p> */}
-        </div>
+          <p className="text-gray-600">Make your predictions for a chance to win!</p>
+        </div> */}
 
         {/* Tabs */}
         {/* Tabs */}

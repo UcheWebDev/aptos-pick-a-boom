@@ -18,7 +18,7 @@ export const menuItems: MenuItem[] = [
   { icon: Home, label: "Home", path: "/" },
   { icon: Target, label: "Stake", path: "/stakings" },
   { icon: Coins, label: "Listings", path: "/super-picks" },
-  { icon: HelpCircle, label: "How to Play", path: "/how-to-play" },
+  // { icon: HelpCircle, label: "How to Play", path: "/how-to-play" },
   // { icon: Trophy, label: "Leaderboard" },
   // { icon: Users, label: "Refer A Friend" },
   // { icon: HelpCircleIcon, label: "FAQs" },

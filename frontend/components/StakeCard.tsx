@@ -345,7 +345,7 @@ export function StakeCard({ stake, authorizedUser }) {
   );
 
   return (
-    <div className="bg-white rounded-xl hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-200 mb-6">
+    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-200 mb-6">
       {/* Header Section */}
       <div className=" p-4 border-b border-gray-100">
         <div className="flex items-center justify-between">
@@ -687,7 +687,6 @@ export function StakeCard({ stake, authorizedUser }) {
                         <Trophy className="w-5 h-5 text-blue-600" />
                         <span className="font-medium text-gray-900">Match #{match.matchId}</span>
                       </div>
-                    
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 mt-3">

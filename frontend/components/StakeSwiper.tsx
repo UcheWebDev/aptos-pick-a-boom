@@ -86,7 +86,7 @@ const StakeCard = ({ stake }) => {
         </div>
 
         {/* Stats/Info */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        {/* <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-2">
             <Clock className="w-4 h-4 text-gray-500" />
             <span className="text-xs text-gray-600">24h limit</span>
@@ -95,7 +95,7 @@ const StakeCard = ({ stake }) => {
             <Shield className="w-4 h-4 text-gray-500" />
             <span className="text-xs text-gray-600">Protected</span>
           </div>
-        </div>
+        </div> */}
 
         {/* Action Button */}
         {/* <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-colors">
@@ -138,11 +138,9 @@ const StakerCard = ({ staker }) => {
             <span className="text-2xl font-bold text-gray-800">{staker.totalStaked}</span>
             <span className="text-base font-semibold text-gray-600">APT</span>
             <div className="flex items-center gap-1 ml-2">
-              <TrendingUp className="w-4 h-4 text-green-500" />
-              <span className="text-xs font-medium text-green-600">Active</span>
+              <span className="text-xs font-medium text-green-600">Total</span>
             </div>
           </div>
-          <span className="text-sm text-gray-500">TOT AMT STAKED</span>
         </div>
 
         {/* Stats Grid */}
@@ -165,7 +163,7 @@ const SwiperSection = ({ title, description, items, type = "stakes", isLoading }
   return (
     <div className="w-full mt-8">
       <div className="mb-4">
-        <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+        <h2 className="text-xl font-bold text-gray-600">{title}</h2>
         {/* <p className="text-gray-600">{description}</p> */}
       </div>
       <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
@@ -193,7 +191,7 @@ const SwiperSection = ({ title, description, items, type = "stakes", isLoading }
 
 const StakeSwiper = ({ newStakes = [], activeStakes = [], isLoading = false, error = null }) => {
   const { toast } = useToast();
-  const MIN_APT_AMOUNT = 0;
+  const MIN_APT_AMOUNT = 1;
 
   // Show error toast when error prop changes
   React.useEffect(() => {
@@ -209,7 +207,7 @@ const StakeSwiper = ({ newStakes = [], activeStakes = [], isLoading = false, err
   // Error handling for stake filtering
   const filteredStakes = useMemo(() => {
     try {
-      return newStakes.filter((stake) => Number(stake.amount) >= MIN_APT_AMOUNT).slice(0, 5);
+      return newStakes.filter((stake) => Number(formatStakeAmount(stake.amount)) >= MIN_APT_AMOUNT).slice(0, 5);
     } catch (err) {
       console.error("Error filtering Wager:", err);
       toast({
