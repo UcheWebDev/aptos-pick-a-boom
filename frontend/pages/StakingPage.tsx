@@ -20,6 +20,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+
 import { useAptosPriceConverter } from "../hooks/useAptosPriceConverter";
 import { useAptosBalance } from "@/hooks/useAptosBalance";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
@@ -217,32 +220,32 @@ export default function BettingForm() {
       setisLoading(true);
       setIsProcessingTransaction(true); // Set processing state to true
 
-      // const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-states`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     selected_matches: selectedMatches.map((s) => s.matchId),
-      //   }),
-      // });
+      const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-states`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          selected_matches: selectedMatches.map((s) => s.matchId),
+        }),
+      });
 
-      // if (!response.ok) {
-      //   throw new Error("Failed to verify match states");
-      // }
+      if (!response.ok) {
+        throw new Error("Failed to verify match states");
+      }
 
-      // const stateCheck = await response.json();
+      const stateCheck = await response.json();
 
-      // if (!stateCheck.valid) {
-      //   toast({
-      //     title: "Cannot Save Predictions",
-      //     description: `${stateCheck.invalidCount} match${stateCheck.invalidCount > 1 ? "es have" : " has"} already started or finished. Please refresh and try again.`,
-      //     variant: "destructive",
-      //   });
-      //   setisLoading(false);
-      //   setIsProcessingTransaction(false);
-      //   return;
-      // }
+      if (!stateCheck.valid) {
+        toast({
+          title: "Cannot Save Predictions",
+          description: `${stateCheck.invalidCount} match${stateCheck.invalidCount > 1 ? "es have" : " has"} already started or finished. Please refresh and try again.`,
+          variant: "destructive",
+        });
+        setisLoading(false);
+        setIsProcessingTransaction(false);
+        return;
+      }
 
       const pairId = await generateUniquePairId();
       const amountInOctas = Math.floor(parseFloat(amount) * 100000000);
@@ -471,6 +474,7 @@ export default function BettingForm() {
               <button
                 key={preset.label}
                 onClick={() => handleCutPresetToggle(preset.multiplier)}
+                disabled={true}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   selectedCutPreset === preset.multiplier
                     ? "bg-blue-600 text-white"
@@ -499,7 +503,7 @@ export default function BettingForm() {
         <button
           onClick={handleSubmit}
           disabled={!connected}
-          className={`w-full  py-4 rounded-lg
+          className={`w-full  py-4 rounded-full
            font-bold  transition-colors 
            ${!connected ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-blue-900 text-white hover:bg-blue-900"}`}
         >
@@ -517,7 +521,7 @@ export default function BettingForm() {
           }
         }}
       >
-        <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-md">
+        <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-md rounded-lg">
           <AlertDialogHeader className="space-y-3">
             <AlertDialogTitle className="text-center text-lg">Confirm Your Bet</AlertDialogTitle>
             <div className="space-y-4 pt-2">
@@ -563,7 +567,7 @@ export default function BettingForm() {
 
       {/* Success Dialog */}
       <AlertDialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
-      <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-md">
+        <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-md rounded-lg">
           <div className="text-center space-y-4">
             <div className="flex justify-center">
               <div className="bg-green-100 p-3 rounded-full">
@@ -586,11 +590,12 @@ export default function BettingForm() {
       </AlertDialog>
 
       {/* Matches Dialog */}
-      <AlertDialog open={isMatchesDialogOpen} onOpenChange={setIsMatchesDialogOpen}>
-        <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-xl ">
-          <AlertDialogHeader>
-            <AlertDialogTitle></AlertDialogTitle>
-          </AlertDialogHeader>
+      <Dialog open={isMatchesDialogOpen} onOpenChange={setIsMatchesDialogOpen}>
+        <DialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-xl rounded-lg">
+          <DialogHeader>
+            <DialogTitle>{/* Title content */}</DialogTitle>
+          </DialogHeader>
+
           <div className="py-2 sm:py-4 overflow-y-auto">
             <FixturesSelection
               matches={todaysMatches}
@@ -602,9 +607,12 @@ export default function BettingForm() {
               }}
             />
           </div>
-          <AlertDialogFooter className="flex flex-row space-x-2 mt-4">
-            <AlertDialogCancel className="w-full sm:w-1/2 mt-0">Cancel</AlertDialogCancel>
-            <AlertDialogAction
+
+          <DialogFooter className="flex flex-row space-x-2 mt-4">
+            <Button variant="outline" className="w-full sm:w-1/2" onClick={() => setIsMatchesDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
               onClick={() => {
                 setSelectedMatches(currentSelectedMatches);
                 setTotalGames(currentSelectedMatches.length.toString());
@@ -613,10 +621,10 @@ export default function BettingForm() {
               className="w-full sm:w-1/2 bg-blue-900 text-white hover:bg-blue-800"
             >
               Confirm
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

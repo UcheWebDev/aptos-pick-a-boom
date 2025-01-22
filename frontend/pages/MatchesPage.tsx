@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 
 import { ArrowLeft, Timer, Info, CheckCircle2, Loader2, Check, X, BookText, RefreshCw, Trophy } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
 import Flag from "../components/Flag";
 import { supabase } from "@/lib/supabase";
 import Modal from "../components/Modal";
@@ -561,9 +563,9 @@ export default function MatchBetting() {
             </p>
             <Link
               to="/super-picks"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Return to Super Picks
+              Return to Wager Listings
             </Link>
           </div>
         ) : matches.length === 0 ? (
@@ -735,43 +737,50 @@ export default function MatchBetting() {
         )}
 
         {/* Predictions Modal */}
-        <Modal isOpen={showPredictionsModal} onClose={() => setShowPredictionsModal(false)} title="Your Predictions">
-          <div className="space-y-4">
-            <div className="divide-y">
-              {selections.map((selection, index) => (
-                <div key={index} className="py-3">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm font-medium">
-                      {selection.homeTeam} vs {selection.awayTeam}
-                    </span>
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {getResultText(selection.prediction, selection.homeTeam, selection.awayTeam)}
-                  </div>
-                </div>
-              ))}
-            </div>
+        <Dialog open={showPredictionsModal} onOpenChange={setShowPredictionsModal}>
+          <DialogContent className="w-[90%] sm:max-w-md rounded-lg">
+            <DialogHeader>
+              <DialogTitle>Your Predictions</DialogTitle>
+              <DialogDescription>Review your match predictions before proceeding.</DialogDescription>
+            </DialogHeader>
 
-            <div className="border-t pt-4">
-              <button
-                onClick={saveSelections}
-                disabled={isSaving}
-                className={`w-full text-white py-3 rounded-lg font-medium transition-colors flex items-center justify-center ${
-                  isSaving ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-                }`}
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving Predictions...
-                  </>
-                ) : (
-                  "Proceed to Bet"
-                )}
-              </button>
+            <div className="space-y-4">
+              <div className="divide-y">
+                {selections.map((selection, index) => (
+                  <div key={index} className="py-3">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-medium">
+                        {selection.homeTeam} vs {selection.awayTeam}
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {getResultText(selection.prediction, selection.homeTeam, selection.awayTeam)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="border-t pt-4">
+                <button
+                  onClick={saveSelections}
+                  disabled={isSaving}
+                  className={`w-full text-white py-3 rounded-lg font-medium transition-colors flex items-center justify-center ${
+                    isSaving ? "bg-blue-400 cursor-not-allowed" : "bg-blue-900 hover:bg-blue-700"
+                  }`}
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving Predictions...
+                    </>
+                  ) : (
+                    "Proceed to Bet"
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
-        </Modal>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

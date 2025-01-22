@@ -24,6 +24,7 @@ const router = createBrowserRouter(
       <Route path="/" element={<Layout><IndexPage/></Layout>} />
       <Route path="/stake" element={<StakePage />} />
       <Route path="/super-picks" element={<StakeLayout><PickPage /></StakeLayout>} />
+      <Route path="/super-picks/:id" element={<StakeLayout><PickPage /></StakeLayout>} />
       <Route path="/bet" element={<PlayPage />} />
       <Route path="/details" element={<BetDetails />} />
       <Route path="/history" element={<HistoryPage />} />

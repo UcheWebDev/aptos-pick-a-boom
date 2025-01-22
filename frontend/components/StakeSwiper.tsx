@@ -1,6 +1,18 @@
 import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CircleUserRound, Text, BookText, Clock, Shield, ArrowUpRight, Trophy, TrendingUp } from "lucide-react";
+import {
+  CircleUserRound,
+  Text,
+  BookText,
+  Clock,
+  Shield,
+  ArrowUpRight,
+  Trophy,
+  TrendingUp,
+  Target,
+  Activity,
+  Coins,
+} from "lucide-react";
 import {
   parseStakeData,
   formatAddress,
@@ -35,35 +47,36 @@ const StakeCard = ({ stake }) => {
   const stakeStatus = getStakeStatus(stake.status);
   const isOpen = stakeStatus === "Open";
   const isCompleted = stakeStatus === "Completed";
-
-  const { aptosToUsd, usdToAptos, loading: priceLoading, error: priceError } = useAptosPriceConverter();
+  const winningAmount = formatStakeAmount(parseFloat(stake.amount) * 2);
 
   return (
-    <div className="bg-white w-72 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
-      <div className="p-4">
+    <div className="bg-white w-80 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-all duration-200 hover:border-blue-100">
+      <div className="p-5">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <div className="bg-blue-50 p-1.5 rounded-lg">
-              <BookText className="w-4 h-4 text-blue-600" />
+          <div className="flex items-center gap-2.5">
+            <div className="bg-blue-50 p-2 rounded-lg">
+              <BookText className="w-5 h-5 text-blue-600" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-700">{formatAddress(stake.creator)}</span>
-              <span className="text-xs text-gray-500">Creator</span>
+              <span className="text-sm font-medium text-gray-700 hover:text-blue-600 cursor-pointer transition-colors">
+                {formatAddress(stake.creator)}
+              </span>
+              {/* <span className="text-xs text-gray-500">Created 2h ago</span> */}
             </div>
           </div>
           <div>
             <span
               className={`
-      text-xs px-3 py-1 rounded-full font-medium
-      ${
-        isCompleted
-          ? "bg-green-50 text-green-700 border border-green-200"
-          : isOpen
-            ? "bg-green-50 text-green-700 border border-green-200"
-            : "bg-red-50 text-red-700 border border-red-200"
-      }
-    `}
+                text-xs px-3 py-1.5 rounded-full font-medium
+                ${
+                  isCompleted
+                    ? "bg-green-50 text-green-700 border border-green-200"
+                    : isOpen
+                      ? "bg-blue-50 text-blue-700 border border-blue-200"
+                      : "bg-red-50 text-red-700 border border-red-200"
+                }
+              `}
             >
               {getStakeStatus(stake.status)}
             </span>
@@ -71,36 +84,48 @@ const StakeCard = ({ stake }) => {
         </div>
 
         {/* Amount Section */}
-        <div className="mb-4">
-          <div className="flex items-baseline gap-2 mb-1">
-            <span className="text-2xl font-bold text-gray-800">{formatStakeAmount(stake.amount)}</span>
-            <span className="text-base font-semibold text-gray-600">APT</span>
-            {/* {priceLoading ? (
-              <span className="text-sm text-gray-500">Loading USD value...</span>
-            ) : priceError ? (
-              <span className="text-xs text-red-500">Unable to load USD value</span>
-            ) : (
-              <span className="text-sm text-gray-500">≈ ${aptosToUsd(parseInt(formatStakeAmount(stake.amount)))}</span>
-            )}{" "} */}
+        <div className="mb-6">
+          <div className="flex items-baseline gap-2 mb-1.5">
+            <span className="text-3xl font-bold text-gray-800">{formatStakeAmount(stake.amount)}</span>
+            <span className="text-base font-semibold text-gray-500">APT</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-500 ">
+            <TrendingUp className="w-4 h-4 text-green-500" />
+            <span className="text-green-600 font-medium">2x</span>
+            <span className="text-gray-400">|</span>
+            <span className="text-xs">F. Win. {winningAmount} APT</span>
           </div>
         </div>
 
-        {/* Stats/Info */}
-        {/* <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-2">
-            <Clock className="w-4 h-4 text-gray-500" />
-            <span className="text-xs text-gray-600">24h limit</span>
+        {/* Stats Grid */}
+        {/* <div className="grid grid-cols-2 gap-4 mb-6 py-4 border-y border-gray-100">
+          <div className="flex flex-col">
+            <span className="text-sm text-gray-500 mb-1">Lock Period</span>
+            <span className="text-sm font-medium text-gray-700">90 Days</span>
           </div>
-          <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-2">
-            <Shield className="w-4 h-4 text-gray-500" />
-            <span className="text-xs text-gray-600">Protected</span>
+          <div className="flex flex-col">
+            <span className="text-sm text-gray-500 mb-1">Validators</span>
+            <span className="text-sm font-medium text-gray-700">3 Active</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm text-gray-500 mb-1">Min. Stake</span>
+            <span className="text-sm font-medium text-gray-700">100 APT</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm text-gray-500 mb-1">Total Stakers</span>
+            <span className="text-sm font-medium text-gray-700">127</span>
           </div>
         </div> */}
 
         {/* Action Button */}
-        {/* <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-colors">
-          View Details
-          <ArrowUpRight className="w-4 h-4" />
+        {/* <button
+          className={`
+            w-full py-2.5 px-4 rounded-lg font-medium text-sm transition-all duration-200
+            ${isOpen ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-100 text-gray-400 cursor-not-allowed"}
+          `}
+          disabled={!isOpen}
+        >
+          {isOpen ? "Pair" : "Closed"}
         </button> */}
       </div>
     </div>
@@ -109,49 +134,66 @@ const StakeCard = ({ stake }) => {
 
 const StakerCard = ({ staker }) => {
   return (
-    <div className="bg-white w-72 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
-      <div className="p-4">
+    <div className="bg-white w-80 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-all duration-200 hover:border-purple-100">
+      <div className="p-5">
         {/* Header with Profile */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <div className="bg-purple-50 p-1.5 rounded-lg">
+          <div className="flex items-center gap-2.5">
+            <div className="bg-purple-50 p-2 rounded-lg ring-1 ring-purple-100">
               <CircleUserRound className="w-5 h-5 text-purple-600" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-800">{formatAddress(staker.address)}</span>
-              <span className="text-xs text-gray-500">Active Staker</span>
+              <span className="text-sm font-medium text-gray-800 hover:text-purple-600 cursor-pointer transition-colors">
+                {formatAddress(staker.address)}
+              </span>
             </div>
           </div>
           <div className="flex items-center">
-            <div className="bg-gray-50 px-3 py-1 rounded-full border border-gray-200">
+            <div className="bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors duration-150 cursor-pointer group">
               <div className="flex items-center gap-1.5">
-                <Trophy className="w-3.5 h-3.5 text-gray-500" />
-                <span className="text-xs font-medium text-gray-600">Wager ({staker.stakeCount})</span>
+                {/* <Trophy className="w-3.5 h-3.5 text-amber-500 group-hover:text-amber-600" /> */}
+                <span className="text-xs font-medium text-gray-700">{staker.stakeCount} Stakes</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Amount Section */}
-        <div className="mb-3">
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-gray-800">{staker.totalStaked}</span>
-            <span className="text-base font-semibold text-gray-600">APT</span>
-            <div className="flex items-center gap-1 ml-2">
-              <span className="text-xs font-medium text-green-600">Total</span>
+        <div className="mb-4 bg-gray-50 p-4 rounded-lg border border-gray-100">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs font-medium text-gray-500">Total Staked</span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-gray-800 tracking-tight">
+                {Number(staker.totalStaked).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+              </span>
+              <span className="text-sm font-semibold text-gray-600">APT</span>
+              <div className="flex items-center gap-1.5 ml-auto">
+                <TrendingUp className="w-3.5 h-3.5 text-green-500" />
+                <span className="text-xs font-medium text-green-600">+12.5%</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Stats Grid */}
-        {/* <div className="grid grid-cols-2 gap-2 mt-4">
-          <div className="bg-gray-50 rounded-lg p-2">
-            <div className="text-xs text-gray-500">Win Rate</div>
-            <div className="text-sm font-medium text-gray-700">{staker.winRate}%</div>
+        {/* <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+            <div className="flex flex-col">
+              <span className="text-xs text-gray-500 mb-1">Success ======</span>
+              <div className="flex items-center gap-1.5">
+                <Target className="w-3.5 h-3.5 text-green-500" />
+                <span className="text-sm font-medium text-gray-700">92%</span>
+              </div>
+            </div>
           </div>
-          <div className="bg-gray-50 rounded-lg p-2">
-            <div className="text-xs text-gray-500">Avg. Stake</div>
-            <div className="text-sm font-medium text-gray-700">{staker.averageStake} APT</div>
+          <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+            <div className="flex flex-col">
+              <span className="text-xs text-gray-500 mb-1">Avg. Lock Time</span>
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-blue-500" />
+                <span className="text-sm font-medium text-gray-700">60 Days</span>
+              </div>
+            </div>
           </div>
         </div> */}
       </div>

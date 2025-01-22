@@ -3,6 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { CircleUserRound, Eye, Loader2, CheckCircle, Check, Copy, Coins, Users, BookCheck, Trophy } from "lucide-react";
 import Modal from "./Modal";
 import { formatAddress, formatStakeAmount } from "../utils/stakeUtils";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 import { pairFunc } from "@/entry-functions/pairFunc";
 import { unStakeFunc } from "@/entry-functions/unStakeFunc";
@@ -17,6 +26,10 @@ import { aptosClient } from "@/utils/aptosClient";
 import { supabase } from "@/lib/supabase";
 
 export function StakeCard({ stake, authorizedUser }) {
+  const [isPairDialogOpen, setIsPairDialogOpen] = useState(false);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const [isUnstakeDialogOpen, setIsUnstakeDialogOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -46,7 +59,7 @@ export function StakeCard({ stake, authorizedUser }) {
       }
       return data;
     },
-    enabled: isDetailsModalOpen,
+    enabled: isDetailsDialogOpen,
   });
 
   const { data: selectedMatches, isLoading: isLoadingMatches } = useQuery({
@@ -75,7 +88,7 @@ export function StakeCard({ stake, authorizedUser }) {
 
       return matchesData;
     },
-    enabled: isDetailsModalOpen && activeTab === "matches",
+    enabled: isDetailsDialogOpen && activeTab === "matches",
   });
 
   const isOpen = stake.status === "Open";
@@ -86,7 +99,7 @@ export function StakeCard({ stake, authorizedUser }) {
   const showStakeTime = stake.selectedTime;
 
   const handleSubmit = () => {
-    setIsModalOpen(true);
+    setIsPairDialogOpen(true);
   };
 
   const handleConfirmPair = async () => {
@@ -110,32 +123,32 @@ export function StakeCard({ stake, authorizedUser }) {
         throw new Error("No matches selected for this stake");
       }
 
-      const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-states`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          selected_matches: stakeDt.selected_matches,
-        }),
-      });
+      // const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-states`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     selected_matches: stakeDt.selected_matches,
+      //   }),
+      // });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.details || "Failed to check match states");
-      }
+      // if (!response.ok) {
+      //   const errorData = await response.json();
+      //   throw new Error(errorData.details || "Failed to check match states");
+      // }
 
-      const matchStateCheck = await response.json();
+      // const matchStateCheck = await response.json();
 
-      if (!matchStateCheck.valid) {
-        toast({
-          title: "Cannot Pair Stake",
-          description: matchStateCheck.message,
-          variant: "destructive",
-        });
-        setisLoading(false);
-        return;
-      }
+      // if (!matchStateCheck.valid) {
+      //   toast({
+      //     title: "Cannot Pair Stake",
+      //     description: matchStateCheck.message,
+      //     variant: "destructive",
+      //   });
+      //   setisLoading(false);
+      //   return;
+      // }
 
       const amountInOctas = Math.floor(parseFloat(stake.amount) * 100000000);
       const committedTransaction = await signAndSubmitTransaction(pairFunc(amountInOctas, stake.creator, stake.id));
@@ -162,8 +175,8 @@ export function StakeCard({ stake, authorizedUser }) {
       });
       settxHash(executedTransaction.hash);
       setisLoading(false);
-      setIsModalOpen(false);
-      setShowSuccess(true);
+      setIsPairDialogOpen(false);
+      setIsSuccessDialogOpen(true);
     } catch (error) {
       setisLoading(false);
       console.error(error);
@@ -181,7 +194,7 @@ export function StakeCard({ stake, authorizedUser }) {
   };
 
   const onUnstakeStake = async () => {
-    setIsUnstakeModalOpen(true);
+    setIsUnstakeDialogOpen(true);
   };
 
   const onCompleteStake = async () => {
@@ -411,14 +424,14 @@ export function StakeCard({ stake, authorizedUser }) {
           {isUserAuthorizedToComplete && !isPaired && !isCompleted ? (
             <>
               <button
-                onClick={() => setIsDetailsModalOpen(true)}
-                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors duration-200"
+                onClick={() => setIsDetailsDialogOpen(true)}
+                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-full text-gray-700 font-medium hover:bg-gray-50 transition-colors duration-200"
               >
                 View Details
               </button>
               <button
                 onClick={() => onUnstakeStake()}
-                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium transition-colors hover:bg-red-700 shadow-sm hover:shadow"
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-full font-medium transition-colors hover:bg-red-700 shadow-sm hover:shadow"
               >
                 Unstake
               </button>
@@ -426,8 +439,8 @@ export function StakeCard({ stake, authorizedUser }) {
           ) : (
             <>
               <button
-                onClick={() => setIsDetailsModalOpen(true)}
-                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors duration-200"
+                onClick={() => setIsDetailsDialogOpen(true)}
+                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-full text-gray-700 font-medium hover:bg-gray-50 transition-colors duration-200"
               >
                 View Details
               </button>
@@ -435,10 +448,10 @@ export function StakeCard({ stake, authorizedUser }) {
                 <button
                   onClick={handleSubmit}
                   disabled={!authorizedUser?.address || authorizedUser?.address === stake.creator}
-                  className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                  className={`flex-1 px-4 py-2.5 rounded-full font-medium transition-all duration-200 ${
                     !authorizedUser?.address || authorizedUser?.address === stake.creator
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                      : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow"
+                      : "bg-blue-900 text-white hover:bg-blue-700 shadow-sm hover:shadow"
                   }`}
                 >
                   {isLoading ? <SpinButton /> : "Pair Stake"}
@@ -448,7 +461,7 @@ export function StakeCard({ stake, authorizedUser }) {
                 <button
                   onClick={onCompleteStake}
                   disabled={isCompleting}
-                  className="flex-1 flex items-center justify-center px-4 py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-500 disabled:opacity-50 rounded-lg transition-colors"
+                  className="flex-1 flex items-center justify-center px-4 py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-500 disabled:opacity-50 rounded-full transition-colors"
                 >
                   {isCompleting ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -463,74 +476,61 @@ export function StakeCard({ stake, authorizedUser }) {
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Confirm Your Stake Pair">
-        <div className="space-y-4">
-          <div className="border-b pb-4">
-            <div className="flex justify-between mb-2">
-              <span className="text-gray-600">Stake Amount:</span>
-              <span className="font-semibold">{stake.amount} APT</span>
+      <Dialog open={isPairDialogOpen} onOpenChange={setIsPairDialogOpen}>
+        <DialogContent className="w-[90%] max-w-md mx-auto rounded-lg">
+          <DialogHeader>
+            <DialogTitle>Confirm Your Stake Pair</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="border-b pb-4">
+              <div className="flex justify-between mb-2">
+                <span className="text-gray-600">Stake Amount:</span>
+                <span className="font-semibold">{stake.amount} APT</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Creator:</span>
+                <span className="font-semibold">{formatAddress(stake.creator)}</span>
+              </div>
             </div>
-
-            <div className="flex justify-between">
-              <span className="text-gray-600">Creator:</span>
-              <span className="font-semibold">{formatAddress(stake.creator)}</span>
-            </div>
+            <DialogDescription>
+              By clicking confirm, you agree to pair this stake with the specified amount.
+            </DialogDescription>
           </div>
-
-          <p className="text-sm text-gray-600">
-            By clicking confirm, you agree to pair this stake with the specified amount.
-          </p>
-
-          <div className="flex space-x-3">
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
-            >
+          <DialogFooter className="flex flex-row gap-3">
+            <Button variant="outline" onClick={() => setIsPairDialogOpen(false)}>
               Cancel
-            </button>
-            <button
-              onClick={handleConfirmPair}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              {isLoading ? <SpinButton /> : "Confirm Pair "}
-            </button>
-          </div>
-        </div>
-      </Modal>
+            </Button>
+            <Button className="bg-blue-900" onClick={handleConfirmPair} disabled={isLoading}>
+              {isLoading ? <SpinButton /> : "Confirm Pair"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {/* Success Modal */}
-      <Modal isOpen={showSuccess} onClose={() => setShowSuccess(false)}>
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
+      {/* Success Dialog */}
+      <Dialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
+        <DialogContent className="w-[90%] max-w-md mx-auto text-center rounded-lg">
+          <div className="flex justify-center mb-4">
             <div className="bg-green-100 p-3 rounded-full">
               <CheckCircle className="h-12 w-12 text-green-500" />
             </div>
           </div>
-          <div>
-            <p className="text-lg font-semibold text-gray-900">Pairing Complete !</p>
-            <p
-              className="text-sm text-gray-600 mt-1 truncate"
-              title={txHash} // Show full hash on hover
-            >
-              Transaction hash: {truncateHash(txHash)}
-            </p>{" "}
-          </div>
-          <button
-            onClick={() => navigateToMatchesPage()}
-            className="w-full px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-700"
-          >
-            Done
-          </button>
-        </div>
-      </Modal>
+          <DialogTitle>Pairing Complete!</DialogTitle>
+          <DialogDescription>Transaction hash: {txHash ? truncateHash(txHash) : ""}</DialogDescription>
+          <DialogFooter className="sm:justify-center">
+            <Button onClick={() => navigateToMatchesPage()} className="w-full sm:w-auto bg-blue-900">
+              Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {/* details Modal */}
-      <Modal isOpen={isDetailsModalOpen} onClose={() => setIsDetailsModalOpen(false)}>
-        <div className="max-w-2xl w-full mx-auto">
-          {/* Modal Header */}
-          <div className="border-b border-gray-200 pb-4 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Wager Details</h2>
+      {/* Details Dialog */}
+      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] w-[90%] rounded-lg overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Wager Details</span>
               <span
                 className={`px-3 py-1 rounded-full text-sm font-medium ${
                   stake.status === "Open" || stake.status === "Completed"
@@ -540,15 +540,15 @@ export function StakeCard({ stake, authorizedUser }) {
               >
                 {stake.status}
               </span>
-            </div>
+            </DialogTitle>
+          </DialogHeader>
 
-            {/* Tabs */}
-            <div className="flex space-x-2">
-              <TabButton tab="details" label="Details" />
-              {stake.status !== "Completed" && <TabButton tab="matches" label="Selected Matches" />}{" "}
-            </div>
+          <div className="flex space-x-2 border-b pb-4">
+            <TabButton tab="details" label="Details" />
+            {stake.status !== "Completed" && <TabButton tab="matches" label="Selected Matches" />}
           </div>
 
+          {/* Existing tab content remains the same */}
           {/* Tab Content */}
           {activeTab === "details" ? (
             // Details Tab Content
@@ -710,42 +710,39 @@ export function StakeCard({ stake, authorizedUser }) {
               )}
             </div>
           )}
-        </div>
-      </Modal>
+        </DialogContent>
+      </Dialog>
 
-      <Modal
-        isOpen={isUnstakeModalOpen}
-        onClose={() => !isUnstakeLoading && setIsUnstakeModalOpen(false)}
-        title="Confirm Unstake"
-      >
-        <div className="space-y-4">
-          <div className="border-b pb-4">
-            <div className="flex justify-between mb-2">
-              <span className="text-gray-600">Stake Amount:</span>
-              <span className="font-semibold">{stake.amount} APT</span>
+      {/* Unstake Dialog */}
+      <Dialog open={isUnstakeDialogOpen} onOpenChange={setIsUnstakeDialogOpen}>
+        <DialogContent className="w-[90%] max-w-md mx-auto rounded-lg">
+          <DialogHeader>
+            <DialogTitle>Confirm Unstake</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="border-b pb-4">
+              <div className="flex justify-between mb-2">
+                <span className="text-gray-600">Stake Amount:</span>
+                <span className="font-semibold">{stake.amount} APT</span>
+              </div>
             </div>
+            <DialogDescription>Are you sure you want to unstake? This action cannot be undone.</DialogDescription>
           </div>
-
-          <p className="text-sm text-gray-600">Are you sure you want to unstake? This action cannot be undone.</p>
-
-          <div className="flex space-x-3">
-            <button
-              onClick={() => setIsUnstakeModalOpen(false)}
+          <DialogFooter className="flex flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsUnstakeDialogOpen(false)}
               disabled={isUnstakeLoading}
-              className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-auto"
             >
               Cancel
-            </button>
-            <button
-              onClick={handleConfirmUnstake}
-              disabled={isUnstakeLoading}
-              className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmUnstake} disabled={isUnstakeLoading} className="w-auto">
               {isUnstakeLoading ? <SpinButton /> : "Confirm Unstake"}
-            </button>
-          </div>
-        </div>
-      </Modal>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

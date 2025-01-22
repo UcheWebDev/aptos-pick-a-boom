@@ -98,12 +98,12 @@ const LeaderboardTable = ({ stakes = [] }) => {
             {winners.length > 0 ? (
               <table className="w-full shadow-md">
                 <thead>
-                  <tr className="border-b border-gray-200 text-sm text-gray-600">
-                    <th className="text-left py-3 px-4">Rank</th>
-                    <th className="text-left py-3 px-4">Winner</th>
-                    <th className="text-right py-3 px-4">Total Wins</th>
-                    <th className="text-right py-3 px-4">Total Amount (APT)</th>
-                    <th className="text-right py-3 px-4">Largest Win (APT)</th>
+                  <tr className="border-b border-gray-300 text-sm text-gray-500">
+                    <th className="text-left py-2 px-2 font-normal">Rank</th>
+                    <th className="text-left py-2 px-2 font-normal">Winner</th>
+                    <th className="text-right py-2 px-2 font-normal">Total Wins</th>
+                    <th className="text-right py-2 px-2 font-normal">Total Amount (APT)</th>
+                    <th className="text-right py-2 px-2 font-normal">Largest Win (APT)</th>
                   </tr>
                 </thead>
                 <tbody>

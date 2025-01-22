@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Clock, Check } from "lucide-react";
+import Flag from "../components/Flag";
 
 const FixturesSelection = ({
   matches,
@@ -76,19 +77,34 @@ const FixturesSelection = ({
             <button
               key={league}
               onClick={() => setActiveFilter(league)}
-              className={`px-4 py-2 text-sm font-medium rounded-lg border ${
+              className={`px-4 py-2 text-sm font-medium rounded-lg border inline-flex items-center justify-center ${
                 activeFilter === league
                   ? "bg-blue-900 text-white border-blue-900"
                   : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
               }`}
             >
-              {league}
+              {league !== "All" && <Flag ccode={league} size="sm" className="rounded-sm mr-2" />}
+              <span className="whitespace-nowrap">{league}</span>
             </button>
           ))}
         </div>
       </div>
 
       <div className="max-h-[60vh] overflow-y-auto space-y-2 px-4">
+        {/* <div className="flex gap-2 mb-4">
+          <button
+            className="px-4 py-2 text-xs font-medium rounded-lg border 
+                 bg-blue-900 text-white border-blue-900"
+          >
+            Outcome
+          </button>
+          <button
+            disabled
+            className="px-4 py-2 text-xs font-medium rounded-lg border bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+          >
+            Scorers
+          </button>
+        </div>{" "} */}
         {filteredMatches.map((match) => {
           const isSelected = currentSelection.some((m) => m.id === match.id);
           const isAlreadySelected = alreadySelectedMatches.some((m) => m.id === match.id);
@@ -121,7 +137,6 @@ const FixturesSelection = ({
             </div>
           );
         })}
-
         {filteredMatches.length === 0 && (
           <div className="flex flex-col items-center justify-center p-8 text-gray-500">
             <p className="text-lg font-medium">No matches available</p>

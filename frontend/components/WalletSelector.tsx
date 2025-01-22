@@ -53,7 +53,7 @@ export function WalletSelector() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          className="px-4 py-2 rounded-lg text-xs font-medium transition-colors mt-2
+          className="px-4 py-2 rounded-full text-xs font-medium transition-colors mt-2
   bg-white border border-gray-300 hover:bg-white
   text-gray-600 
  

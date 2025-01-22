@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 
 import { ArrowLeft, Globe, Unlock, UserRound, ListStart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -21,6 +22,7 @@ export default function PlayPredictor() {
   const [isLoading, setisLoading] = useState(true);
   const { account } = useWallet();
   const [activeTab, setActiveTab] = useState("all");
+  const { id } = useParams(); // URL path parameter
 
   const { data } = useQuery({
     queryKey: ["stake-content"],

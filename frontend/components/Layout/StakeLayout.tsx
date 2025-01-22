@@ -5,7 +5,6 @@ import LeftStakeSidebar from "./LeftStakeSidebar";
 import MobileNav from "./MobileNav";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 
-
 interface LayoutProps {
   children: React.ReactNode;
 }
