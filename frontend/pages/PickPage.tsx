@@ -112,9 +112,9 @@ export default function PlayPredictor() {
   ];
 
   return (
-    <div className="">
+    <div className="bg-gray-900">
       {/* Main Content */}
-      <div className="">
+      <div className="bg-gray-900">
         {/* <div className="text-left mb-10">
           <h1 className="text-2xl font-bold mb-2">Wager Listings</h1>
           <p className="text-gray-600">Make your predictions for a chance to win!</p>
@@ -122,8 +122,8 @@ export default function PlayPredictor() {
 
         {/* Tabs */}
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6 ">
+          <TabsList className="grid w-full grid-cols-4 bg-gray-900">
             {tabConfigs.map((tab) => (
               <TabsTrigger key={tab.value} value={tab.value} className="flex items-center space-x-2">
                 {tab.icon}
@@ -136,14 +136,14 @@ export default function PlayPredictor() {
         {/* Loading State */}
         {isLoading && (
           <div className="flex justify-center items-center py-16">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <Loader2 className="h-12 w-12 animate-spin text-gray-400" />
           </div>
         )}
 
         {/* Stakes Grid */}
         {!isLoading && (
           <>
-            <div className="gap-8 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
               {finalFilteredStakes.map((stake) => (
                 <StakeCard key={stake.id} stake={stake} authorizedUser={account} />
               ))}

@@ -39,14 +39,12 @@ export const formatAddress = (address) => {
 export const calculateTopStakers = (stakes, MIN_APT_AMOUNT) => {
     try {
         const stakerMap = new Map();
-
-        // First pass: collect all stakes and total amounts
         stakes
-            .filter((stake) => Number(formatStakeAmount(stake.amount)) >= MIN_APT_AMOUNT)
+            .filter((stake) => Number(formatStakeAmount(stake.stake_amount)) >= MIN_APT_AMOUNT)
             .forEach((stake) => {
-                const creator = stake.creator;
-                const amount = Number(stake.amount);
-                const isWin = stake.winner === creator;
+                const creator = stake.creator_addr;
+                const amount = Number(stake.stake_amount);
+                const isWin = stake.winner_addr === creator;
 
                 if (stakerMap.has(creator)) {
                     const existing = stakerMap.get(creator);

@@ -351,24 +351,24 @@ export function StakeCard({ stake, authorizedUser }) {
     <button
       onClick={() => setActiveTab(tab)}
       className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors
-          ${activeTab === tab ? "bg-blue-100 text-blue-700" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"}`}
+          ${activeTab === tab ? "bg-cyan-400 text-dark" : "text-gray-500 "}`}
     >
       {label}
     </button>
   );
 
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-200 mb-6">
+    <div className="bg-gray-900 shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-600 mb-6">
       {/* Header Section */}
-      <div className=" p-4 border-b border-gray-100">
+      <div className=" p-4 border-b border-gray-600">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="bg-white p-2 rounded-full shadow-sm">
-              <CircleUserRound className="w-6 h-6 text-blue-600" />
+            <div className="bg-gray-800 p-2 rounded-full shadow-sm">
+              <CircleUserRound className="w-6 h-6 text-cyan-400" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Creator</p>
-              <p className="text-gray-800 font-semibold">{formatAddress(stake.creator)}</p>
+              <p className="text-sm font-medium text-gray-200">Creator</p>
+              <p className="text-gray-200 font-semibold">{formatAddress(stake.creator)}</p>
             </div>
           </div>
           <div className="flex flex-col items-end">
@@ -376,9 +376,9 @@ export function StakeCard({ stake, authorizedUser }) {
             <span
               className={`mt-1 px-3 py-1 rounded-full text-xs font-medium ${
                 stake.status === "Open" || stake.status === "Completed"
-                  ? "bg-green-100 border border-green-700 text-green-700"
+                  ? "bg-green-400 border border-green-800 text-green-800"
                   : stake.status === "Paired"
-                    ? "bg-blue-100 border border-blue-700 text-blue-700"
+                    ? "bg-cyan-400 border border-blue-700 text-blue-700"
                     : "bg-gray-100 text-gray-700"
               }`}
             >
@@ -393,14 +393,14 @@ export function StakeCard({ stake, authorizedUser }) {
 
       <div className="p-4 space-y-4">
         {/* Amount Section */}
-        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
           <div className="flex items-center space-x-2">
             <Coins className="w-5 h-5 text-blue-600" />
-            <span className="text-gray-600">Stake Amount</span>
+            <span className="text-gray-300">Stake Amount</span>
           </div>
           <div className="flex items-baseline space-x-1">
-            <span className="text-2xl font-bold text-gray-800">{stake.amount}</span>
-            <span className="text-sm font-medium text-gray-500">APT</span>
+            <span className="text-2xl font-bold text-gray-100">{stake.amount}</span>
+            <span className="text-sm font-medium text-gray-100">APT</span>
           </div>
         </div>
         <div className="">
@@ -425,7 +425,7 @@ export function StakeCard({ stake, authorizedUser }) {
             <>
               <button
                 onClick={() => setIsDetailsDialogOpen(true)}
-                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-full text-gray-700 font-medium hover:bg-gray-50 transition-colors duration-200"
+                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-full text-gray-400 font-medium transition-colors duration-200"
               >
                 View Details
               </button>
@@ -440,7 +440,7 @@ export function StakeCard({ stake, authorizedUser }) {
             <>
               <button
                 onClick={() => setIsDetailsDialogOpen(true)}
-                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-full text-gray-700 font-medium hover:bg-gray-50 transition-colors duration-200"
+                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-full text-gray-400 font-medium transition-colors duration-200"
               >
                 View Details
               </button>
@@ -451,7 +451,7 @@ export function StakeCard({ stake, authorizedUser }) {
                   className={`flex-1 px-4 py-2.5 rounded-full font-medium transition-all duration-200 ${
                     !authorizedUser?.address || authorizedUser?.address === stake.creator
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                      : "bg-blue-900 text-white hover:bg-blue-700 shadow-sm hover:shadow"
+                      : "bg-cyan-400 text-dark shadow-sm hover:shadow"
                   }`}
                 >
                   {isLoading ? <SpinButton /> : "Pair Stake"}
@@ -477,19 +477,19 @@ export function StakeCard({ stake, authorizedUser }) {
       </div>
 
       <Dialog open={isPairDialogOpen} onOpenChange={setIsPairDialogOpen}>
-        <DialogContent className="w-[90%] max-w-md mx-auto rounded-lg">
+        <DialogContent className="w-[90%] max-w-md mx-auto bg-gray-900 border-0 rounded-lg">
           <DialogHeader>
-            <DialogTitle>Confirm Your Stake Pair</DialogTitle>
+            <DialogTitle className="text-gray-400">Confirm Your Stake Pair</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="border-b pb-4">
               <div className="flex justify-between mb-2">
-                <span className="text-gray-600">Stake Amount:</span>
-                <span className="font-semibold">{stake.amount} APT</span>
+                <span className="text-gray-400">Stake Amount:</span>
+                <span className="font-semibold text-white">{stake.amount} APT</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Creator:</span>
-                <span className="font-semibold">{formatAddress(stake.creator)}</span>
+                <span className="text-gray-400">Creator:</span>
+                <span className="font-semibold text-white">{formatAddress(stake.creator)}</span>
               </div>
             </div>
             <DialogDescription>
@@ -500,7 +500,7 @@ export function StakeCard({ stake, authorizedUser }) {
             <Button variant="outline" onClick={() => setIsPairDialogOpen(false)}>
               Cancel
             </Button>
-            <Button className="bg-blue-900" onClick={handleConfirmPair} disabled={isLoading}>
+            <Button className="bg-cyan-400 text-dark hover:bg-cyan-500" onClick={handleConfirmPair} disabled={isLoading}>
               {isLoading ? <SpinButton /> : "Confirm Pair"}
             </Button>
           </DialogFooter>
@@ -509,16 +509,16 @@ export function StakeCard({ stake, authorizedUser }) {
 
       {/* Success Dialog */}
       <Dialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
-        <DialogContent className="w-[90%] max-w-md mx-auto text-center rounded-lg">
+        <DialogContent className="w-[90%] max-w-md mx-auto border-0 text-center bg-gray-900 rounded-lg">
           <div className="flex justify-center mb-4">
-            <div className="bg-green-100 p-3 rounded-full">
+            <div className="bg-green- p-3 rounded-full">
               <CheckCircle className="h-12 w-12 text-green-500" />
             </div>
           </div>
-          <DialogTitle>Pairing Complete!</DialogTitle>
+          <DialogTitle className="text-gray-400">Pairing Complete!</DialogTitle>
           <DialogDescription>Transaction hash: {txHash ? truncateHash(txHash) : ""}</DialogDescription>
           <DialogFooter className="sm:justify-center">
-            <Button onClick={() => navigateToMatchesPage()} className="w-full sm:w-auto bg-blue-900">
+            <Button onClick={() => navigateToMatchesPage()} className="w-full sm:w-auto bg-cyan-400 text-dark">
               Done
             </Button>
           </DialogFooter>
@@ -527,11 +527,11 @@ export function StakeCard({ stake, authorizedUser }) {
 
       {/* Details Dialog */}
       <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] w-[90%] rounded-lg overflow-y-auto">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] w-[90%] rounded-lg bg-gray-900  border-0 overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
-              <span>Wager Details</span>
-              <span
+              <span className="text-gray-100">Wager Informations</span>
+              {/* <span
                 className={`px-3 py-1 rounded-full text-sm font-medium ${
                   stake.status === "Open" || stake.status === "Completed"
                     ? "bg-green-50 text-green-700 border border-green-200"
@@ -539,11 +539,11 @@ export function StakeCard({ stake, authorizedUser }) {
                 }`}
               >
                 {stake.status}
-              </span>
+              </span> */}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="flex space-x-2 border-b pb-4">
+          <div className="flex space-x-2 border-b border-gray-700 pb-4">
             <TabButton tab="details" label="Details" />
             {stake.status !== "Completed" && <TabButton tab="matches" label="Selected Matches" />}
           </div>
@@ -562,66 +562,66 @@ export function StakeCard({ stake, authorizedUser }) {
             ) : stakeDetails ? (
               <div className="space-y-6">
                 {/* Main Info Section */}
-                <div className="bg-blue-50 rounded-lg p-4">
+                <div className="bg-gray-800 p-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-gray-500">Created By</p>
-                      <p className="font-medium text-gray-900">{formatAddress(stake.creator)}</p>
+                      <p className="text-sm text-gray-400">Created By</p>
+                      <p className="font-medium text-gray-400">{formatAddress(stake.creator)}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Amount</p>
-                      <p className="font-medium text-gray-900">{stake.amount} APT</p>
+                      <p className="text-sm text-gray-400">Amount</p>
+                      <p className="font-medium text-gray-400">{stake.amount} APT</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="bg-gray-800 p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-500">Total Cut</p>
-                        <p className="text-lg font-semibold text-gray-900">{stakeDetails.total_cut}</p>
+                        <p className="text-sm text-gray-400">Total Cut</p>
+                        <p className="text-lg font-semibold text-gray-400">{stakeDetails.total_cut}</p>
                       </div>
-                      <div className="bg-white p-2 rounded-full">
-                        <Coins className="w-5 h-5 text-blue-600" />
+                      <div className="bg-gray-900 p-2 rounded-full">
+                        <Coins className="w-5 h-5 text-cyan-400" />
                       </div>
                     </div>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="bg-gray-800 p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-500">Total Picks</p>
-                        <p className="text-lg font-semibold text-gray-900">{stakeDetails.total_picks}</p>
+                        <p className="text-sm text-gray-400">Total Picks</p>
+                        <p className="text-lg font-semibold text-gray-400">{stakeDetails.total_picks}</p>
                       </div>
-                      <div className="bg-white p-2 rounded-full">
-                        <Users className="w-5 h-5 text-blue-600" />
+                      <div className="bg-gray-900 p-2 rounded-full">
+                        <Users className="w-5 h-5 text-cyan-400" />
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Timeline Section */}
-                <div className="border-t border-gray-200 pt-4">
-                  <h3 className="text-sm font-medium text-gray-900 mb-3">Timeline</h3>
+                <div className="border-t border-gray-700 pt-4">
+                  <h3 className="text-sm font-medium text-gray-400 mb-3">Timeline</h3>
                   <div className="space-y-4">
                     <div className="flex items-start space-x-3">
-                      <div className="bg-green-100 p-1 rounded-full">
+                      <div className="bg-green-400 p-1 rounded-full">
                         <CheckCircle className="w-4 h-4 text-green-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">Stake Created</p>
+                        <p className="text-sm font-medium text-gray-400">Stake Created</p>
                         {/* <p className="text-sm text-gray-500">{formatDate(stakeDetails.created_at)}</p> */}
                       </div>
                     </div>
 
                     {stakeDetails.pairer_addr && (
                       <div className="flex items-start space-x-3">
-                        <div className="bg-blue-100 p-1 rounded-full">
-                          <Users className="w-4 h-4 text-blue-600" />
+                        <div className="bg-gray-900 p-1 rounded-full">
+                          <Users className="w-4 h-4 text-cyan-400" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-sm font-medium text-gray-400">
                             Paired by {formatAddress(stakeDetails.pairer_addr)}
                           </p>
                           <p className="text-sm text-gray-500">Stake was paired</p>
@@ -635,8 +635,8 @@ export function StakeCard({ stake, authorizedUser }) {
                           <BookCheck className="w-4 h-4 text-green-600" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">Wager completed</p>
-                          <p className="text-sm text-gray-500">Winner is {formatAddress(stakeDetails.winner_addr)}</p>
+                          <p className="text-sm font-medium text-gray-400">Wager completed</p>
+                          <p className="text-sm text-gray-400">Winner is {formatAddress(stakeDetails.winner_addr)}</p>
                         </div>
                       </div>
                     )}
@@ -644,9 +644,9 @@ export function StakeCard({ stake, authorizedUser }) {
                 </div>
 
                 {/* Additional Details */}
-                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                <div className="bg-gray-800 rounded-lg p-4 space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">Pair ID</span>
+                    <span className="text-sm text-gray-400">Pair ID</span>
                     <div className="flex items-center gap-2">
                       <code className="bg-gray-100 px-2 py-1 rounded text-sm">{stake.pair_id}</code>
                       <button
@@ -681,24 +681,24 @@ export function StakeCard({ stake, authorizedUser }) {
                 </div>
               ) : selectedMatches?.length > 0 ? (
                 selectedMatches.map((match) => (
-                  <div key={match.matchId} className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                  <div key={match.matchId} className="bg-gray-800 p-4 transition-colors">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center space-x-2">
-                        <Trophy className="w-5 h-5 text-blue-600" />
-                        <span className="font-medium text-gray-900">Match #{match.matchId}</span>
+                        <Trophy className="w-5 h-5 text-cyan-400" />
+                        <span className="font-medium text-gray-400">Match #{match.matchId}</span>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 mt-3">
                       <div>
                         <p className="text-sm text-gray-500">Teams</p>
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-gray-400">
                           {match.homeTeam} vs {match.awayTeam}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-500">Date</p>
-                        <p className="text-sm font-medium text-gray-900">{match.matchTime}</p>
+                        <p className="text-sm font-medium text-gray-400">{match.matchTime}</p>
                       </div>
                     </div>
                   </div>
@@ -715,15 +715,15 @@ export function StakeCard({ stake, authorizedUser }) {
 
       {/* Unstake Dialog */}
       <Dialog open={isUnstakeDialogOpen} onOpenChange={setIsUnstakeDialogOpen}>
-        <DialogContent className="w-[90%] max-w-md mx-auto rounded-lg">
+        <DialogContent className="w-[90%] max-w-md mx-auto rounded-lg border-0 bg-gray-900">
           <DialogHeader>
-            <DialogTitle>Confirm Unstake</DialogTitle>
+            <DialogTitle className="text-gray-400">Confirm Unstake</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="border-b pb-4">
+            <div className="border-b border-gray-700 pb-4">
               <div className="flex justify-between mb-2">
-                <span className="text-gray-600">Stake Amount:</span>
-                <span className="font-semibold">{stake.amount} APT</span>
+                <span className="text-gray-400">Stake Amount:</span>
+                <span className="font-semibold text-white">{stake.amount} APT</span>
               </div>
             </div>
             <DialogDescription>Are you sure you want to unstake? This action cannot be undone.</DialogDescription>

@@ -13,14 +13,14 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onClose }) => {
   const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   return (
-    <aside className="w-64 bg-white border-r h-full flex flex-col">
+    <aside className="w-64 bg-gray-900 border-r border-gray-800 h-full flex flex-col">
       <div className="p-4 flex-1">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-blue-900 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold">P</span>
             </div>
-            <span className="text-xl font-semibold text-gray-800">PickABoom</span>
+            <span className="text-xl font-semibold text-gray-300">PickABoom</span>
           </div>
           {!isDesktop && (
             <button

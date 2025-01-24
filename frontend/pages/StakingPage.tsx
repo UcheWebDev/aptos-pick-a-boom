@@ -39,6 +39,9 @@ import Sidebar from "../components/Sidebar";
 import { stakeFunc } from "@/entry-functions/stakeFunc";
 import SpinButton from "@/components/SpinButton";
 import FixturesSelection from "@/components/FixturesSelection";
+import { formatStakeAmount } from "@/utils/stakeUtils";
+
+
 
 const presetAmounts = [1, 5, 10, 15];
 const cutPresets = [
@@ -370,10 +373,10 @@ export default function BettingForm() {
 
   return (
     <div className="">
-      <div className="bg-white rounded-lg p-6">
+      <div className="bg-gray-800 p-6 rounded-lg  rounded-lg p-6">
         {/* Balance Display */}
         {connected ? (
-          <div className="p-4 bg-gray-50 rounded-lg mb-6">
+          <div className="p-4 bg-gray-800 border border-gray-600 rounded-lg mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Wallet className="h-5 w-5 text-gray-600 mr-2" />
@@ -391,21 +394,21 @@ export default function BettingForm() {
         {/* Amount Input */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-gray-700">Stake Amount</label>
-            <button onClick={toggleCurrency} className="text-sm text-blue-600 hover:text-blue-700 flex items-center">
+            <label className="block text-sm font-medium text-gray-400">Stake Amount</label>
+            <button onClick={toggleCurrency} className="text-sm text-cyan-400 hover:text-cyan-500 flex items-center">
               <DollarSign className="h-4 w-4 mr-1" />
               Switch to {isUsdMode ? "APT" : "USD"}
             </button>
           </div>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white">
               {isUsdMode ? "$" : "APT"}
             </span>
             <input
               type="number"
               value={amount}
               onChange={(e) => handleAmountChange(e.target.value)}
-              className={`w-full pl-12 pr-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              className={`w-full pl-12 pr-4 py-3 text-white bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors.amount ? "border-red-500" : ""
               }`}
               placeholder={`Total amount in ${isUsdMode ? "USD" : "APT"}`}
@@ -424,7 +427,7 @@ export default function BettingForm() {
               <button
                 key={preset}
                 onClick={() => handleAmountChange(preset.toString())}
-                className="px-2 py-1 text-sm border border-gray-600 rounded hover:bg-gray-50 transition-colors"
+                className="px-2 py-1 text-sm bg-gray-900 text-gray-400 border border-gray-600 rounded hover:bg-gray-50 transition-colors"
               >
                 {getDisplayAmount(preset)}
               </button>
@@ -435,8 +438,8 @@ export default function BettingForm() {
         {/* Amount Input */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-gray-700">Total Picks</label>
-            <button onClick={openMatchesDialog} className="text-sm text-blue-600 hover:text-blue-700 flex items-center">
+            <label className="block text-sm font-medium text-gray-400">Total Picks</label>
+            <button onClick={openMatchesDialog} className="text-sm text-cyan-400  hover:text-cyan-500 flex items-center">
               available games ({matchesCount})
             </button>
           </div>
@@ -448,10 +451,11 @@ export default function BettingForm() {
               type="number"
               value={totalGames}
               onChange={(e) => handleTotalGamesChange(e.target.value)}
-              className={`w-full pl-12 pr-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              className={`w-full pl-12 pr-4 py-3 bg-gray-900 text-white rounded-lg border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors.totalGames ? "border-red-500" : ""
               }`}
               placeholder="Total number of games"
+              readOnly={true}
             />
           </div>
           {errors.totalGames && (
@@ -465,7 +469,7 @@ export default function BettingForm() {
         {/* Multiplier Section */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <label className="text-sm font-medium text-gray-700">Flex</label>
+            <label className="text-sm font-medium text-gray-400">Flex (coming soon)</label>
           </div>
 
           {/* Cut Presets */}
@@ -475,10 +479,10 @@ export default function BettingForm() {
                 key={preset.label}
                 onClick={() => handleCutPresetToggle(preset.multiplier)}
                 disabled={true}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg  text-sm font-medium transition-colors ${
                   selectedCutPreset === preset.multiplier
                     ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    : "bg-gray-900 border border-gray-600 text-gray-700 hover:bg-gray-200"
                 }`}
               >
                 {preset.label}
@@ -488,15 +492,15 @@ export default function BettingForm() {
         </div>
 
         {/* Summary */}
-        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+        <div className="bg-gray-900 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center text-gray-600">
+            <div className="flex items-center text-gray-400">
               <Calculator className="h-5 w-5 mr-2" />
               <span>Potential Win</span>
             </div>
             <span className="font-bold text-green-600">{getFormattedPotentialWinnings()}</span>
           </div>
-          <div className="text-xs text-gray-500">*Final payout is 1x of wager amount</div>
+          <div className="text-xs text-gray-400">*Final payout is 1x of wager amount</div>
         </div>
 
         {/* Place Bet Button */}
@@ -505,7 +509,7 @@ export default function BettingForm() {
           disabled={!connected}
           className={`w-full  py-4 rounded-full
            font-bold  transition-colors 
-           ${!connected ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-blue-900 text-white hover:bg-blue-900"}`}
+           ${!connected ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-cyan-400 text-dark hover:bg-cyan-500"}`}
         >
           Place Bet
         </button>
@@ -521,27 +525,27 @@ export default function BettingForm() {
           }
         }}
       >
-        <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-md rounded-lg">
+        <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-md rounded-lg bg-gray-900 border-0">
           <AlertDialogHeader className="space-y-3">
-            <AlertDialogTitle className="text-center text-lg">Confirm Your Bet</AlertDialogTitle>
+            <AlertDialogTitle className="text-center text-lg text-gray-100">Confirm Your Wager</AlertDialogTitle>
             <div className="space-y-4 pt-2">
               <div className="border-b pb-4">
                 <div className="flex justify-between mb-2 text-sm sm:text-base">
-                  <span className="text-gray-600">Stake Amount:</span>
-                  <span className="font-semibold">{formatAmount(parseFloat(amount))}</span>
+                  <span className="text-gray-400">Stake Amount:</span>
+                  <span className="text-white font-semibold">{formatAmount(parseFloat(amount))}</span>
                 </div>
                 <div className="flex justify-between mb-2 text-sm sm:text-base">
-                  <span className="text-gray-600">Multiplier:</span>
-                  <span className="font-semibold">{multiplier.toFixed(1)}x</span>
+                  <span className="text-gray-400">Multiplier:</span>
+                  <span className="text-white font-semibold">{multiplier.toFixed(1)}x</span>
                 </div>
                 <div className="flex justify-between text-sm sm:text-base">
-                  <span className="text-gray-600">Potential Win:</span>
+                  <span className="text-gray-400">Potential Win:</span>
                   <span className="font-semibold text-green-600">
                     {formatAmount(calculatePotentialWinnings(amount))}
                   </span>
                 </div>
               </div>
-              <AlertDialogDescription className="text-xs sm:text-sm text-gray-600 text-center">
+              <AlertDialogDescription className="text-xs sm:text-sm text-gray-400 text-center">
                 By clicking confirm, you agree to place this wager with the specified parameters.
               </AlertDialogDescription>
             </div>
@@ -556,7 +560,7 @@ export default function BettingForm() {
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmBet}
-              className="w-full sm:w-1/2 bg-blue-900 text-white hover:bg-blue-800"
+              className="w-full sm:w-1/2 bg-cyan-400 text-dark hover:bg-cyan-500"
               disabled={isProcessingTransaction}
             >
               {isLoading ? <SpinButton /> : "Confirm Bet"}
@@ -567,23 +571,23 @@ export default function BettingForm() {
 
       {/* Success Dialog */}
       <AlertDialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
-        <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-md rounded-lg">
+        <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-md bg-gray-900 border-0 rounded-lg">
           <div className="text-center space-y-4">
             <div className="flex justify-center">
-              <div className="bg-green-100 p-3 rounded-full">
+              <div className="bg-gray-800 p-3 rounded-full">
                 <CheckCircle className="h-12 w-12 text-green-500" />
               </div>
             </div>
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-center">Stake placed!</AlertDialogTitle>
+              <AlertDialogTitle className="text-center text-white">Stake placed !</AlertDialogTitle>
               <div className="text-center">
-                <p className="text-sm text-gray-600 mt-1 truncate" title={txHash}>
+                <p className="text-sm text-gray-400 mt-1 truncate" title={txHash}>
                   Transaction hash: {truncateHash(txHash)}
                 </p>
               </div>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogAction className="w-full bg-blue-900 text-white hover:bg-blue-600">Done</AlertDialogAction>
+              <AlertDialogAction className="w-full bg-cyan-400 text-dark font-bold hover:bg-cyan-500">Done</AlertDialogAction>
             </AlertDialogFooter>
           </div>
         </AlertDialogContent>
@@ -591,7 +595,7 @@ export default function BettingForm() {
 
       {/* Matches Dialog */}
       <Dialog open={isMatchesDialogOpen} onOpenChange={setIsMatchesDialogOpen}>
-        <DialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-xl rounded-lg">
+        <DialogContent className="w-[95%] p-4 bg-gray-900 sm:p-6 sm:w-full sm:max-w-xl rounded-lg border-0">
           <DialogHeader>
             <DialogTitle>{/* Title content */}</DialogTitle>
           </DialogHeader>
@@ -609,7 +613,7 @@ export default function BettingForm() {
           </div>
 
           <DialogFooter className="flex flex-row space-x-2 mt-4">
-            <Button variant="outline" className="w-full sm:w-1/2" onClick={() => setIsMatchesDialogOpen(false)}>
+            <Button variant="outline" className="w-full sm:w-1/2 bg-red-600 border-0 text-white" onClick={() => setIsMatchesDialogOpen(false)}>
               Cancel
             </Button>
             <Button
@@ -618,7 +622,7 @@ export default function BettingForm() {
                 setTotalGames(currentSelectedMatches.length.toString());
                 setIsMatchesDialogOpen(false);
               }}
-              className="w-full sm:w-1/2 bg-blue-900 text-white hover:bg-blue-800"
+              className="w-full sm:w-1/2 bg-cyan-400 text-dark hover:bg-cyan-400"
             >
               Confirm
             </Button>

@@ -19,7 +19,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ onClose }) => {
   const isFiltersActive = amountFilter !== "all" || walletAddress !== "" || pairId !== "";
 
   return (
-    <aside className="w-80 bg-white h-full overflow-y-auto">
+    <aside className="w-80 bg-gray-900 h-full overflow-y-auto border-r border-gray-600">
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           {!isDesktop && (
@@ -31,11 +31,11 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ onClose }) => {
 
         {/* Content */}
 
-        <div className="p-4">
+        <div className="p-4 space-y-6">
           <div className="mb-4">
-            <div className="text-md mb-2">Filter amount</div>
+            <div className="text-md mb-2 text-gray-400">Filter amount</div>
             <Select value={amountFilter} onValueChange={setAmountFilter}>
-              <SelectTrigger className="w-full text-sm p-3 rounded-lg border border-gray-300 text-gray-600 placeholder-gray-500">
+              <SelectTrigger className="w-full text-sm p-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-600 placeholder-gray-400 text-gray-400">
                 <SelectValue placeholder="Filter Stake Amount" />
               </SelectTrigger>
               <SelectContent>
@@ -48,24 +48,24 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ onClose }) => {
           </div>
 
           <div className="mb-4">
-            <div className="text-md mb-2">Track wallet</div>
+            <div className="text-md mb-2 text-gray-400">Track wallet</div>
             <input
               type="text"
               value={walletAddress}
               onChange={(e) => setWalletAddress(e.target.value)}
-              placeholder="Paste wallet Address..."
-              className="w-full text-sm p-3 rounded-lg border border-gray-300 text-gray-600 placeholder-gray-500"
+              placeholder="Paste Wallet Address"
+              className="w-full text-sm p-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-400 placeholder-gray-400"
             />
           </div>
 
           <div className="mb-4">
-            <div className="text-md mb-2">Pair ID</div>
+            <div className="text-md mb-2 text-gray-400">Pair ID</div>
             <input
               type="text"
               value={pairId}
               onChange={(e) => setPairId(e.target.value)}
               placeholder="Paste Pair ID..."
-              className="w-full text-sm p-3 rounded-lg border border-gray-300 text-gray-600 placeholder-gray-500"
+              className="w-full text-sm p-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-400 placeholder-gray-400"
             />
           </div>
 
@@ -73,7 +73,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ onClose }) => {
             load
           </button> */}
           <Button
-            className="w-full p-3 text-sm rounded-lg bg-blue-900 text-white font-medium mb-4 swiper-title"
+            className="w-full p-3 text-sm rounded-lg bg-cyan-400 text-dark font-medium mb-4 swiper-title"
             onClick={resetFilters}
             disabled={!isFiltersActive}
           >

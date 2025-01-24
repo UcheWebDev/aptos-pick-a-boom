@@ -479,9 +479,9 @@ export default function MatchBetting() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900">
       {/* Header */}
-      <div className="bg-blue-900 text-white sticky top-0 z-10">
+      <div className="bg-gray-900 text-white sticky top-0 z-10 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Main Header Row */}
           <div className="py-4">
@@ -492,7 +492,7 @@ export default function MatchBetting() {
                   <ArrowLeft className="h-5 w-5 mr-2" />
                   <span className="text-sm sm:text-base">Back</span>
                 </Link>
-                <h1 className="text-lg sm:text-xl font-bold">Match Predictions</h1>
+                <h1 className="text-sm font-bold">Match Predictions</h1>
               </div>
 
               {/* Right side with action buttons */}
@@ -612,12 +612,12 @@ export default function MatchBetting() {
                 );
               };
               return (
-                <div key={match.id} className="bg-white rounded-lg shadow-sm p-4">
+                <div key={match.id} className="bg-gray-800 rounded-lg shadow-sm p-4">
                   {/* League & Time */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-2">
                       <Flag ccode={match.ccode} size="sm" className="rounded-sm" />
-                      <span className="text-sm font-medium">{match.league}</span>
+                      <span className="text-sm font-medium text-gray-400">{match.league}</span>
                     </div>
                     {renderMatchState()}
                   </div>
@@ -634,12 +634,12 @@ export default function MatchBetting() {
                         match.started || match.finished || match.cancelled
                           ? "opacity-50 cursor-not-allowed"
                           : selections.find((s) => s.matchId === match.matchId && s.prediction === "home")
-                            ? "bg-blue-50 border-blue-500 text-blue-700"
+                            ? "bg-gray-900 border-cyan-400 text-white"
                             : existingSelection === "home"
                               ? "bg-blue-50 border-blue-500 text-blue-700"
                               : existingSelection
                                 ? "opacity-50 cursor-not-allowed"
-                                : "hover:bg-gray-50"
+                                : "hover:bg-gray-90 text-white border border-gray-500"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
@@ -667,12 +667,12 @@ export default function MatchBetting() {
                         match.started || match.finished || match.cancelled
                           ? "opacity-50 cursor-not-allowed"
                           : selections.find((s) => s.matchId === match.matchId && s.prediction === "draw")
-                            ? "bg-blue-50 border-blue-500 text-blue-700"
+                            ? "bg-gray-900 border-cyan-400 text-white"
                             : existingSelection === "draw"
                               ? "bg-blue-50 border-blue-500 text-blue-700"
                               : existingSelection
                                 ? "opacity-50 cursor-not-allowed"
-                                : "hover:bg-gray-50"
+                                : "text-white border border-gray-500"
                       }`}
                     >
                       <div className="text-center mb-2">
@@ -700,12 +700,12 @@ export default function MatchBetting() {
                         match.started || match.finished || match.cancelled
                           ? "opacity-50 cursor-not-allowed"
                           : selections.find((s) => s.matchId === match.matchId && s.prediction === "away")
-                            ? "bg-blue-50 border-blue-500 text-blue-700"
+                            ? "bg-gray-900 border-cyan-400 text-white"
                             : existingSelection === "away"
                               ? "bg-blue-50 border-blue-500 text-blue-700"
                               : existingSelection
                                 ? "opacity-50 cursor-not-allowed"
-                                : "hover:bg-gray-50"
+                                : "text-white border border-gray-500"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
@@ -738,9 +738,9 @@ export default function MatchBetting() {
 
         {/* Predictions Modal */}
         <Dialog open={showPredictionsModal} onOpenChange={setShowPredictionsModal}>
-          <DialogContent className="w-[90%] sm:max-w-md rounded-lg">
+          <DialogContent className="w-[90%] sm:max-w-md rounded-lg bg-gray-900 border-0">
             <DialogHeader>
-              <DialogTitle>Your Predictions</DialogTitle>
+              <DialogTitle className="text-gray-400">Your Predictions</DialogTitle>
               <DialogDescription>Review your match predictions before proceeding.</DialogDescription>
             </DialogHeader>
 
@@ -749,11 +749,11 @@ export default function MatchBetting() {
                 {selections.map((selection, index) => (
                   <div key={index} className="py-3">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium">
+                      <span className="text-sm font-medium text-gray-400">
                         {selection.homeTeam} vs {selection.awayTeam}
                       </span>
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-500">
                       {getResultText(selection.prediction, selection.homeTeam, selection.awayTeam)}
                     </div>
                   </div>
@@ -764,8 +764,8 @@ export default function MatchBetting() {
                 <button
                   onClick={saveSelections}
                   disabled={isSaving}
-                  className={`w-full text-white py-3 rounded-lg font-medium transition-colors flex items-center justify-center ${
-                    isSaving ? "bg-blue-400 cursor-not-allowed" : "bg-blue-900 hover:bg-blue-700"
+                  className={`w-full text-dark py-3 rounded-lg font-medium transition-colors flex items-center justify-center ${
+                    isSaving ? "bg-cyan-200 cursor-not-allowed" : "bg-cyan-400 "
                   }`}
                 >
                   {isSaving ? (

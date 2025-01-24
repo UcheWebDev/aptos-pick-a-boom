@@ -1,18 +1,10 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, TrendingUp, Medal, ScrollText } from "lucide-react";
-import { parseStakeData } from "../utils/stakeUtils";
+import { Trophy, ArrowBigUp, Medal, ScrollText } from "lucide-react";
+import { formatStakeAmount } from "@/utils/stakeUtils";
 
 const LeaderboardTable = ({ stakes = [] }) => {
-  // Ensure stakes is an array
   const safeStakes = Array.isArray(stakes) ? stakes : [];
-
-  // Convert octas to APT
-  const octasToApt = (octas) => {
-    return Number(octas) / 100000000;
-  };
-
-  // Process stakes to get winner statistics
   const getWinnerStats = () => {
     if (safeStakes.length === 0) {
       return [];
@@ -22,9 +14,7 @@ const LeaderboardTable = ({ stakes = [] }) => {
 
     safeStakes.forEach((stake) => {
       try {
-        const parsedStake = parseStakeData(stake);
-        const winner = parsedStake?.winner;
-
+        const winner = stake.winner_addr;
         if (winner) {
           if (!winnerStats[winner]) {
             winnerStats[winner] = {
@@ -35,7 +25,7 @@ const LeaderboardTable = ({ stakes = [] }) => {
             };
           }
 
-          const stakeAmount = parsedStake.amount || 0;
+          const stakeAmount = stake.stake_amount || 0;
           winnerStats[winner].totalWins += 1;
           winnerStats[winner].totalAmount += stakeAmount;
           winnerStats[winner].largestWin = Math.max(winnerStats[winner].largestWin, stakeAmount);
@@ -74,36 +64,30 @@ const LeaderboardTable = ({ stakes = [] }) => {
           <ScrollText className="h-8 w-8 text-gray-400" />
         </div>
         <div className="text-center space-y-2">
-          <h3 className="text-lg font-medium text-gray-900">No Winners Yet</h3>
+          <h3 className="text-lg font-medium text-gray-500">No Winners Yet</h3>
           <p className="text-sm text-gray-500 max-w-sm">
             There are currently no recorded winners. Check back soon to see the leaderboard updates.
           </p>
         </div>
-        <div className="pt-4">
-          <div className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
-            <Trophy className="h-4 w-4 mr-2" />
-            Future Champions Await
-          </div>
-        </div>
+       
       </div>
     </div>
   );
 
   return (
     <>
-      <div className="text-xl font-bold flex items-center gap-2 mb-4 text-gray-600">Leatherboards</div>
-      <Card className="w-full shadow-md">
+      <div className="text-xl font-bold flex items-center gap-2 mb-4 text-white">Leatherboards</div>
+      <Card className="w-full bg-gray-800 border border-gray-700">
         <CardContent>
           <div className="overflow-x-auto">
             {winners.length > 0 ? (
               <table className="w-full shadow-md">
                 <thead>
-                  <tr className="border-b border-gray-300 text-sm text-gray-500">
-                    <th className="text-left py-2 px-2 font-normal">Rank</th>
-                    <th className="text-left py-2 px-2 font-normal">Winner</th>
-                    <th className="text-right py-2 px-2 font-normal">Total Wins</th>
-                    <th className="text-right py-2 px-2 font-normal">Total Amount (APT)</th>
-                    <th className="text-right py-2 px-2 font-normal">Largest Win (APT)</th>
+                  <tr className="border-b border-gray-700 text-sm text-gray-500">
+                    <th className="text-left p-4 text-white">Rank</th>
+                    <th className="text-left p-4 text-white">Winner</th>
+                    <th className="text-right p-4 text-white">Total Wins</th>
+                    <th className="text-right p-4 text-white">Largest Win (APT)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -111,24 +95,22 @@ const LeaderboardTable = ({ stakes = [] }) => {
                     <tr
                       key={winner.address}
                       className={`
-                        border-b border-gray-100 hover:bg-gray-50 transition-colors
-                        ${index < 3 ? "font-medium" : ""}
+                      border-b border-gray-700 last:border-0 ${index < 3 ? "font-medium" : ""}
                       `}
                     >
-                      <td className="py-3 px-4">
+                      <td className="p-4">
                         <div className="flex items-center gap-2">
                           <RankMedal rank={index} />
                         </div>
                       </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
+                      <td className="p-4">
+                        <div className="flex items-center gap-2 text-white">
                           {truncateAddress(winner.address)}
-                          {index === 0 && <TrendingUp className="h-4 w-4 text-green-500" />}
+                          {index === 0 && <ArrowBigUp className="h-4 w-4 text-green-500" />}
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-right">{winner.totalWins}</td>
-                      <td className="py-3 px-4 text-right">{winner.totalAmount.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-right">{winner.largestWin.toFixed(2)}</td>
+                      <td className="p-4 text-right text-white">{winner.totalWins}</td>
+                      <td className="p-4 text-right text-gray-600">{formatStakeAmount(winner.largestWin)} APT</td>
                     </tr>
                   ))}
                 </tbody>

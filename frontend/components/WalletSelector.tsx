@@ -54,7 +54,7 @@ export function WalletSelector() {
       <DropdownMenuTrigger asChild>
         <Button
           className="px-4 py-2 rounded-full text-xs font-medium transition-colors mt-2
-  bg-white border border-gray-300 hover:bg-white
+  bg-gray-900 border border-gray-600 hover:bg-white
   text-gray-600 
  
   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
@@ -82,13 +82,7 @@ export function WalletSelector() {
   ) : (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button
-          className="px-4 py-2 rounded-lg text-xs font-medium transition-colors mt-2
-  bg-white border border-gray-800 hover:bg-white
-  text-gray-800 "
-        >
-          Connect
-        </Button>
+        <Button className="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors">Connect</Button>
       </DialogTrigger>
       <ConnectWalletDialog close={closeDialog} />
     </Dialog>

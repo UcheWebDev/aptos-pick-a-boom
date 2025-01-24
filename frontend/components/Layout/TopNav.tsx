@@ -65,7 +65,7 @@ const TopNav: React.FC<TopNavProps> = ({ onMenuClick, onNotificationsClick }) =>
 
   return (
     <nav
-      className={`bg-white px-4 md:px-6 py-3 ${!isDesktop ? "mt-16" : ""} flex-none transition-shadow duration-200 ${isScrolled ? "border border-b shadow-2xl" : ""}`}
+      className={`bg-gray-900 px-4 md:px-6 py-3 border-b border-gray-800 ${!isDesktop ? "mt-16" : ""} flex-none transition-shadow duration-200 ${isScrolled ? "border border-b shadow-2xl" : ""}`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -80,7 +80,7 @@ const TopNav: React.FC<TopNavProps> = ({ onMenuClick, onNotificationsClick }) =>
                 <ArrowLeft className="h-5 w-5 text-gray-600" />
               </button>
             )}
-            <h1 className="text-xl font-semibold text-gray-800">{getPageTitle()}</h1>
+            <h1 className="text-md font-semibold text-gray-400">{getPageTitle()}</h1>
           </div>
         </div>
 

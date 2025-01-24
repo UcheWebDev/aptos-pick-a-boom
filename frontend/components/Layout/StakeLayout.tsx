@@ -38,7 +38,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
           onNotificationsClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
         />
-        <main className="flex-1 overflow-auto p-4 md:p-6 bg-white">
+        <main className="flex-1 overflow-auto p-4 md:p-6 bg-gray-900">
           <div className="h-full">{children}</div>
         </main>
       </div>

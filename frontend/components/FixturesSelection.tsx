@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Clock, Check } from "lucide-react";
+import { BookText, Check } from "lucide-react";
 import Flag from "../components/Flag";
 
 const FixturesSelection = ({
@@ -60,16 +60,26 @@ const FixturesSelection = ({
           </div>
         )}
       </div>
-      <p className="font-medium text-sm text-center line-clamp-2">{teamName}</p>
+      <p className="font-medium text-sm text-gray-400 text-center line-clamp-2">{teamName}</p>
     </div>
   );
 
   return (
     <div className="space-y-4">
-      <div className="sticky top-0 bg-white p-4 border-b z-10">
+      <div className="sticky top-0 bg-gray-900 p-4 border-b border-gray-700 z-10">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold">Select Matches</h3>
-          <span className="text-sm text-gray-600">Selected: {currentSelection.length}</span>
+          <h3 className="text-lg text-white font-semibold">Select Matches</h3>
+          <div className="relative">
+            <BookText className="h-5 w-5 text-white" />
+            {currentSelection.length > 0 && (
+              <span
+                className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full 
+                          min-w-[18px] h-[18px] inline-flex items-center justify-center px-1"
+              >
+                {currentSelection.length}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="flex overflow-x-auto gap-2 mt-4">
@@ -79,8 +89,8 @@ const FixturesSelection = ({
               onClick={() => setActiveFilter(league)}
               className={`px-4 py-2 text-sm font-medium rounded-lg border inline-flex items-center justify-center ${
                 activeFilter === league
-                  ? "bg-blue-900 text-white border-blue-900"
-                  : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
+                  ? "bg-gray-800 text-white border-0"
+                  : "bg-gray-900 text-gray-300 border-gray-400 "
               }`}
             >
               {league !== "All" && <Flag ccode={league} size="sm" className="rounded-sm mr-2" />}
@@ -114,7 +124,7 @@ const FixturesSelection = ({
               key={match.id}
               onClick={() => handleMatchSelect(match)}
               className={`
-                relative p-4 rounded-lg border transition-all cursor-pointer
+                relative p-4 bg-gray-800 transition-all cursor-pointer
                 ${isSelected ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-blue-200"}
                 ${isAlreadySelected ? "border-blue-500 bg-blue-50" : ""}
               `}
@@ -125,7 +135,7 @@ const FixturesSelection = ({
                 </div>
               )}
 
-              <div className="text-xs font-medium text-center text-gray-500 mb-4">{match.ccode} League</div>
+              <div className="text-xs font-medium text-center text-gray-400 mb-4">{match.ccode} League</div>
 
               <div className="grid grid-cols-3 items-center gap-4">
                 <TeamLogo src={match.homeLogo} teamName={match.homeTeam} />
