@@ -66,7 +66,7 @@ const FixturesSelection = ({
 
   return (
     <div className="space-y-4">
-      <div className="sticky top-0 bg-gray-900 p-4 border-b border-gray-700 z-10">
+      <div className="sticky top-0 bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-4  z-10">
         <div className="flex justify-between items-center">
           <h3 className="text-lg text-white font-semibold">Select Matches</h3>
           <div className="relative">
@@ -124,14 +124,14 @@ const FixturesSelection = ({
               key={match.id}
               onClick={() => handleMatchSelect(match)}
               className={`
-                relative p-4 bg-gray-800 transition-all cursor-pointer
+                relative p-4 bg-gradient-to-br from-gray-900 to-gray-800  border border-gray-700 transition-all cursor-pointer
                 ${isSelected ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-blue-200"}
                 ${isAlreadySelected ? "border-blue-500 bg-blue-50" : ""}
               `}
             >
               {(isSelected || isAlreadySelected) && (
                 <div className="absolute top-2 right-2">
-                  <Check className="w-5 h-5 text-blue-500" />
+                  <Check className="w-5 h-5 text-white" />
                 </div>
               )}
 

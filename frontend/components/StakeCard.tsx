@@ -1,6 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CircleUserRound, Eye, Loader2, CheckCircle, Check, Copy, Coins, Users, BookCheck, Trophy } from "lucide-react";
+import {
+  CircleUserRound,
+  Eye,
+  Loader2,
+  CheckCircle,
+  Check,
+  Copy,
+  Coins,
+  Users,
+  BookCheck,
+  Trophy,
+  ChevronRight,
+  CircuitBoard,
+  Zap,
+} from "lucide-react";
 import Modal from "./Modal";
 import { formatAddress, formatStakeAmount } from "../utils/stakeUtils";
 import {
@@ -358,9 +372,8 @@ export function StakeCard({ stake, authorizedUser }) {
   );
 
   return (
-    <div className="bg-gray-900 shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-600 mb-6">
-      {/* Header Section */}
-      <div className=" p-4 border-b border-gray-600">
+    <div className="">
+      {/* <div className=" p-4 border-b border-gray-600">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="bg-gray-800 p-2 rounded-full shadow-sm">
@@ -386,13 +399,9 @@ export function StakeCard({ stake, authorizedUser }) {
             </span>
           </div>
         </div>
-      </div>
-      {/* <div>
-        <p>{stake.createdAt}</p>
       </div> */}
-
+      {/* 
       <div className="p-4 space-y-4">
-        {/* Amount Section */}
         <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
           <div className="flex items-center space-x-2">
             <Coins className="w-5 h-5 text-blue-600" />
@@ -403,22 +412,7 @@ export function StakeCard({ stake, authorizedUser }) {
             <span className="text-sm font-medium text-gray-100">APT</span>
           </div>
         </div>
-        <div className="">
-          {/* <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
-            <Clock className="w-4 h-4 text-gray-500" />
-            <div>
-              <p className="text-xs text-gray-500">Lock Time</p>
-              <p className="text-sm font-medium">{stake.selectedTime || "N/A"}</p>
-            </div>
-          </div> */}
-          {/* <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
-            <Users className="w-4 h-4 text-gray-500" />
-            <div>
-              <p className="text-xs text-gray-500">Total Pairs</p>
-              <p className="text-sm font-medium">{stake.totalPairs || "0"}</p>
-            </div>
-          </div> */}
-        </div>
+        <div className=""></div>
 
         <div className="flex gap-2 pt-2">
           {isUserAuthorizedToComplete && !isPaired && !isCompleted ? (
@@ -474,6 +468,73 @@ export function StakeCard({ stake, authorizedUser }) {
             </>
           )}
         </div>
+      </div> */}
+      <div className="relative group">
+        {/* Animated border effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 rounded-2xl animate-pulse blur"></div>
+
+        <div className="relative bg-gray-900 rounded-2xl p-6 border border-amber-500/20 backdrop-blur-xl">
+          {/* Decorative circuit lines */}
+          <div className="absolute inset-0 overflow-hidden rounded-2xl opacity-20">
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent"></div>
+            <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>
+            <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>
+          </div>
+
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-amber-500 blur-md rounded-lg"></div>
+                <div className="relative bg-gray-900 p-3 rounded-lg border border-amber-500">
+                  <CircuitBoard className="w-6 h-6 text-amber-400" />
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-white group-hover:text-amber-400 transition-colors">
+                {formatAddress(stake.creator)}
+              </h3>
+            </div>
+            <div className="relative ml-4">
+              <div className="absolute inset-0 bg-pink-500/20 blur-md rounded-full"></div>
+              <div className="relative flex items-center gap-2 bg-gray-800/50 px-4 py-2 rounded-full border border-pink-500/50">
+                <Zap className="w-4 h-4 text-pink-500" />
+                <span className="text-pink-400 font-bold">{stake.pair_id}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Rest of the component remains the same */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gray-800/50 rounded-lg p-4 border border-amber-500/20 group-hover:border-amber-500/40 transition-colors">
+                <p className="text-amber-400/60 text-sm mb-2">Created at</p>
+                <p className="text-white font-mono font-bold">{stake.created_at}</p>
+              </div>
+              <div className="bg-gray-800/50 rounded-lg p-4 border border-amber-500/20 group-hover:border-amber-500/40 transition-colors">
+                <p className="text-amber-400/60 text-sm mb-2">Created at</p>
+                <p className="text-white font-mono font-bold">{stake.created_at}</p>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 bg-amber-500/5 blur-md rounded-lg"></div>
+              <div className="relative bg-gray-800/50 rounded-lg p-4 border border-amber-500/20">
+                <div className="flex justify-between items-center">
+                  <span className="text-amber-400/60">Minimum Stake</span>
+                  <span className="text-white font-mono font-bold">{stake.amount}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button className="relative w-full mt-6 group">
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-pink-500 to-pink-500 rounded-xl blur group-hover:blur-md transition-all"></div>
+            <div className="relative bg-gray-900 text-white py-3 rounded-xl font-medium group-hover:bg-gray-900/50 transition-all flex items-center justify-center gap-2">
+              <span className="group-hover:text-amber-400 transition-colors">Stake Now</span>
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </button>
+        </div>
       </div>
 
       <Dialog open={isPairDialogOpen} onOpenChange={setIsPairDialogOpen}>
@@ -500,7 +561,11 @@ export function StakeCard({ stake, authorizedUser }) {
             <Button variant="outline" onClick={() => setIsPairDialogOpen(false)}>
               Cancel
             </Button>
-            <Button className="bg-cyan-400 text-dark hover:bg-cyan-500" onClick={handleConfirmPair} disabled={isLoading}>
+            <Button
+              className="bg-cyan-400 text-dark hover:bg-cyan-500"
+              onClick={handleConfirmPair}
+              disabled={isLoading}
+            >
               {isLoading ? <SpinButton /> : "Confirm Pair"}
             </Button>
           </DialogFooter>

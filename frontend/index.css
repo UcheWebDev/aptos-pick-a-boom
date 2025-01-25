@@ -87,16 +87,13 @@
       "Segoe UI Emoji",
       "Segoe UI Symbol",
       "Noto Color Emoji";
+      font-family: "Ubuntu", serif;
+      font-weight: 300;
   }
+  
 }
 
-body {
-  margin: 0;
-  /* font-family: "Work Sans", serif; */
 
-  /* -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale; */
-}
 
 .swiper-title {
   font-family: "Work Sans", serif;

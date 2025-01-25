@@ -1,5 +1,5 @@
 import React from "react";
-import { AlignLeft } from "lucide-react";
+import { AlignLeft,Gem } from "lucide-react";
 
 interface MobileNavProps {
   isSidebarOpen: boolean;
@@ -15,9 +15,9 @@ const MobileNav: React.FC<MobileNavProps> = ({ onToggleSidebar }) => {
         </button>
 
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-900 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold">P</span>
-          </div>
+        <div className="bg-gray-900 p-2 rounded-lg">
+              <Gem className="w-6 h-6 text-amber-500" />
+            </div>
           <span className="text-xl font-semibold text-white">PickABoom</span>
         </div>
       </div>

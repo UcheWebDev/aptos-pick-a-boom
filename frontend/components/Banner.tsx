@@ -75,60 +75,99 @@ const MicroBettingBanner = ({ stake = [] }) => {
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-gray-800 p-6 border rounded-lg border-gray-700 hover:border-cyan-500 transition-colors">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-cyan-500/10 rounded-lg">
-              <BarChart3 className="text-cyan-400" />
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 rounded-2xl animate-pulse blur-sm"></div>
+
+          <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 border border-amber-500/20">
+            <div className="absolute inset-0 overflow-hidden rounded-xl opacity-20 pointer-events-none">
+              <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent"></div>
+              <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>
+              <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>
             </div>
-            <div>
-              <p className="text-gray-400">Total Value Staked</p>
-              <h3 className="text-2xl font-bold text-white">
-                {typeof totalStaked === "number" ? totalStaked : "0.00"} APT
-              </h3>
+
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
+                <div className="bg-gray-900 p-2 rounded-lg">
+                  <BarChart3 className="w-5 h-5 text-amber-500" />
+                </div>
+              </div>
+              <div>
+                <p className="text-gray-400">Total Value Staked</p>
+                <h3 className="text-2xl font-bold text-white">
+                  {typeof totalStaked === "number" ? totalStaked.toFixed(2) : "0.00"} APT
+                </h3>
+              </div>
             </div>
-          </div>
-          <div className="mt-4 flex items-center text-green-400">
-            <ArrowUpRight size={16} />
-            <span className="ml-1">
-              {percentageChange >= 0 ? "+" : ""}
-              {percentageChange.toFixed(1)}% from previous month
-            </span>
+            <div className="mt-4 flex items-center text-green-400">
+              <ArrowUpRight size={16} />
+              <span className="ml-1">
+                {percentageChange >= 0 ? "+" : ""}
+                {percentageChange.toFixed(1)}% from previous month
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="bg-gray-800 p-6 border rounded-lg border-gray-700 hover:border-purple-500 transition-colors">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-500/10 rounded-lg">
-              <Coins className="text-purple-400" />
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 rounded-2xl animate-pulse blur-sm"></div>
+
+          <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 border border-amber-500/20">
+            <div className="absolute inset-0 overflow-hidden rounded-xl opacity-20 pointer-events-none">
+              <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent"></div>
+              <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>
+              <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>
             </div>
-            <div>
-              <p className="text-gray-400">Total Winings</p>
-              <h3 className="text-2xl font-bold text-white">
-                {typeof totalWinnings === "number" ? totalWinnings : "0.00"} APT
-              </h3>
+
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
+                <div className="bg-gray-900 p-2 rounded-lg">
+                  <Coins className="w-5 h-5 text-amber-500" />
+                </div>
+              </div>
+              <div>
+                <p className="text-gray-400">Total Winings</p>
+                <h3 className="text-2xl font-bold text-white">
+                  {typeof totalWinnings === "number" ? totalWinnings.toFixed(2) : "0.00"} APT
+                </h3>
+              </div>
             </div>
-          </div>
-          <div className="mt-4 flex items-center text-green-400">
-            <ArrowUpRight size={16} />
-            <span className="ml-1">+{avgAPY.toFixed(1)}% monthly</span>
+            <div className="mt-4 flex items-center text-green-400">
+              <ArrowUpRight size={16} />
+              <span className="ml-1">+{avgAPY.toFixed(1)}% monthly</span>
+            </div>
           </div>
         </div>
 
-        <div className="bg-gray-800 p-6 border rounded-lg border-gray-700 hover:border-pink-500 transition-colors">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-pink-500/10 rounded-lg">
-              <Clock className="text-pink-400" />
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 rounded-2xl animate-pulse blur-sm"></div>
+
+          <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 border border-amber-500/20">
+            <div className="absolute inset-0 overflow-hidden rounded-xl opacity-20 pointer-events-none">
+              <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent"></div>
+              <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>
+              <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>
             </div>
-            <div>
-              <p className="text-gray-400">Average APY</p>
-              <h3 className="text-2xl font-bold text-white">
-                {typeof avgAPY === "number" ? avgAPY.toFixed(1) : "0.0"}%
-              </h3>
+
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
+                <div className="bg-gray-900 p-2 rounded-lg">
+                  <Clock className="w-5 h-5 text-amber-500" />
+                </div>
+              </div>
+              <div>
+                <p className="text-gray-400">Average APY</p>
+                <h3 className="text-2xl font-bold text-white">
+                  {typeof avgAPY === "number" ? avgAPY.toFixed(1) : "0.0"}%
+                </h3>
+              </div>
             </div>
-          </div>
-          <div className="mt-4 flex items-center text-green-400">
-            <ArrowUpRight size={16} />
-            <span className="ml-1">Active for {monthsDiff} months</span>
+            <div className="mt-4 flex items-center text-green-400">
+              <ArrowUpRight size={16} />
+              <span className="ml-1">Active for {monthsDiff} months</span>
+            </div>
           </div>
         </div>
       </div>

@@ -143,7 +143,7 @@ export default function PlayPredictor() {
         {/* Stakes Grid */}
         {!isLoading && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
               {finalFilteredStakes.map((stake) => (
                 <StakeCard key={stake.id} stake={stake} authorizedUser={account} />
               ))}

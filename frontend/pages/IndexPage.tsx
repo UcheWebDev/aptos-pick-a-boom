@@ -4,16 +4,17 @@ import MicroBettingBanner from "../components/Banner";
 import StakeSwiper from "../components/StakeSwiper";
 import LeaderboardTable from "../components/LeaderboardTable";
 import { toast } from "@/components/ui/use-toast";
-import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 
 const IndexPage = () => {
   const [newStakes, setNewStakes] = useState([]);
   const [activeStakes, setActiveStakes] = useState([]);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["stake-content"],
-    queryFn: async () => {
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
       try {
         const { data: stakes, error } = await supabase
           .from("stakes")
@@ -21,18 +22,21 @@ const IndexPage = () => {
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-        return stakes;
+
+        setData(stakes);
+        setIsLoading(false);
       } catch (error) {
         toast({
           variant: "destructive",
           title: "Error",
           description: error.message,
         });
-        return [];
+        setIsLoading(false);
       }
-    },
-    refetchInterval: 10_000,
-  });
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (data) {
@@ -42,6 +46,7 @@ const IndexPage = () => {
 
   return (
     <>
+      {/* <HeroSlider /> */}
       <div className="space-y-8">
         <MicroBettingBanner stake={newStakes} />
         <StakeSwiper newStakes={newStakes} activeStakes={activeStakes} isLoading={isLoading} />

@@ -11,7 +11,7 @@ import {
   truncateAddress,
   useWallet,
 } from "@aptos-labs/wallet-adapter-react";
-import { ArrowLeft, ArrowRight, Copy, LogOut, User, ChevronDown } from "lucide-react";
+import { ArrowLeft, ArrowRight, Copy, LogOut, User, ChevronDown, Wallet } from "lucide-react";
 import { useCallback, useState } from "react";
 // Internal components
 import { Button } from "@/components/ui/button";
@@ -52,15 +52,11 @@ export function WalletSelector() {
   return connected ? (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          className="px-4 py-2 rounded-full text-xs font-medium transition-colors mt-2
-  bg-gray-900 border border-gray-600 hover:bg-white
-  text-gray-600 
- 
-  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
-        >
-          {account?.ansName || truncateAddress(account?.address) || "Unknown"}
-          <ChevronDown className="h-4 w-4 ml-2" />
+        <Button className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-700 transition-colors">
+          <span className="flex items-center space-x-2">
+            <Wallet className="w-4 h-4" />
+            <span> {account?.ansName || truncateAddress(account?.address) || "Unknown"}</span>
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -82,7 +78,7 @@ export function WalletSelector() {
   ) : (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button className="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors">Connect</Button>
+        <Button className="bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:from-amber-600 hover:to-pink-600 transition-all ">Connect</Button>
       </DialogTrigger>
       <ConnectWalletDialog close={closeDialog} />
     </Dialog>
