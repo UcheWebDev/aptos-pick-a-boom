@@ -56,11 +56,11 @@ const StakeCard = ({ stake }) => {
   return (
     <div className="relative group">
       {/* Animated border effect */}
-      <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 rounded-2xl animate-pulse blur-sm"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 animate-pulse blur-sm"></div>
 
-      <div className="relative bg-gray-900 rounded-2xl p-6 border border-amber-500/20 backdrop-blur-xl">
+      <div className="relative bg-gray-900 p-6 border border-amber-500/20 backdrop-blur-xl">
         {/* Decorative circuit lines */}
-        <div className="absolute inset-0 overflow-hidden rounded-2xl opacity-20 pointer-events-none">
+        <div className="absolute inset-0 overflow-hidden opacity-20 pointer-events-none">
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
           <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent"></div>
           <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>
@@ -70,21 +70,25 @@ const StakeCard = ({ stake }) => {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="absolute inset-0 bg-amber-500 blur-md rounded-lg"></div>
-              <div className="relative bg-gray-900 p-3 rounded-lg border border-amber-500">
+              {/* <div className="relative bg-gray-900 p-3 rounded-lg border border-amber-500">
                 <TrendingUp className="w-6 h-6 text-amber-400" />
+              </div> */}
+              <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
+                <div className="bg-gray-900 p-2 rounded-lg">
+                  <TrendingUp className="w-6 h-6 text-amber-500" />
+                </div>
               </div>
             </div>
-            <h3 className="text-xl font-bold text-white group-hover:text-amber-400 transition-colors mr-4">
+            {/* <h3 className="text-xl font-bold text-white group-hover:text-amber-400 transition-colors mr-4">
               Stake Details
-            </h3>
+            </h3> */}
           </div>
-          <div className="relative">
+          {/* <div className="relative">
             <div className="absolute inset-0 bg-pink-500/20 blur-md rounded-full"></div>
             <div className="relative flex items-center gap-2 bg-gray-800/50 px-4 py-2 rounded-full border border-pink-500/50">
               <span className="text-pink-400 font-bold">#</span>
             </div>
-          </div>
+          </div> */}
         </div>
 
         <div className="space-y-4">
@@ -94,7 +98,7 @@ const StakeCard = ({ stake }) => {
                 <CircleUser className="w-4 h-4 text-amber-500" />
                 <span className="text-amber-400/60">Address</span>
               </div>
-              <span className="text-white font-mono">{formatAddress(stake.creator_addr)}</span>
+              <span className="text-white font-mono  ml-4">{formatAddress(stake.creator_addr)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-amber-400/60">Total Matches</span>
@@ -108,14 +112,14 @@ const StakeCard = ({ stake }) => {
 
           {isOpen ? (
             <button className="relative w-full mt-6 group">
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-pink-500 to-pink-500 rounded-xl blur group-hover:blur-md transition-all"></div>
-              <div className="relative bg-gray-900 text-white py-3 rounded-xl font-medium group-hover:bg-gray-900/50 transition-all flex items-center justify-center gap-2 border border-amber-500/20">
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-pink-500 to-pink-500 blur group-hover:blur-md transition-all"></div>
+              <div className="relative bg-gray-900 text-white py-3 font-medium group-hover:bg-gray-900/50 transition-all flex items-center justify-center gap-2 border border-amber-500/20">
                 <span className="group-hover:text-amber-400 transition-colors">Pair Now</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </button>
           ) : (
-            <div className="w-full bg-gray-800 text-gray-400 py-3 rounded-xl font-bold text-center mt-6 border border-amber-500/20">
+            <div className="w-full bg-gray-800 text-gray-400 py-3 font-bold text-center mt-6 border border-amber-500/20">
               {isCompleted ? "Completed" : "Closed"}
             </div>
           )}
@@ -136,10 +140,10 @@ const StakerCard = ({ staker }) => {
 
   return (
     <div className="relative group">
-      <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 rounded-2xl animate-pulse blur-sm"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 animate-pulse blur-sm"></div>
 
-      <div className="bg-gradient-to-br bg-gray-900 rounded-xl p-6 border border-amber-500/20 transform transition-all duration-300">
-        <div className="absolute inset-0 overflow-hidden rounded-xl opacity-20 pointer-events-none">
+      <div className="bg-gradient-to-br bg-gray-900 p-6 border border-amber-500/20 transform transition-all duration-300">
+        <div className="absolute inset-0 overflow-hidden opacity-20 pointer-events-none">
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
           <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent"></div>
           <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>
@@ -149,21 +153,25 @@ const StakerCard = ({ staker }) => {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="absolute inset-0 bg-amber-500 blur-md rounded-lg"></div>
-              <div className="relative bg-gray-900 p-3 rounded-lg border border-amber-500">
+              {/* <div className="relative bg-gray-900 p-3 rounded-lg border border-amber-500">
                 <Rocket className="w-5 h-5 text-pink-500" />
+              </div> */}
+              <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
+                <div className="bg-gray-900 p-2 rounded-lg">
+                  <Rocket className="w-6 h-6 text-amber-500" />
+                </div>
               </div>
             </div>
-            <h3 className="text-xl font-bold text-white group-hover:text-amber-400 transition-colors mr-4">
+            {/* <h3 className="text-xl font-bold text-white group-hover:text-amber-400 transition-colors mr-4">
               Stake Details
-            </h3>
+            </h3> */}
           </div>
-          <div className="relative">
+          {/* <div className="relative">
             <div className="absolute inset-0 bg-pink-500/20 blur-md rounded-full"></div>
             <div className="relative flex items-center gap-2 bg-gray-800/50 px-4 py-2 rounded-full border border-pink-500/50">
               <span className="text-pink-400 font-bold">#</span>
             </div>
-          </div>
+          </div> */}
         </div>
 
         <div className="space-y-4">
@@ -188,7 +196,7 @@ const StakerCard = ({ staker }) => {
           <div className="relative">
             <button
               onClick={handleViewInfoClick}
-              className="w-full bg-gradient-to-r from-pink-500 to-amber-500 text-white py-3 rounded-xl font-bold hover:from-pink-600 hover:to-amber-600 transition-all duration-300 flex items-center justify-center space-x-2 group"
+              className="w-full bg-gradient-to-r from-pink-500 to-amber-500 text-white py-3 font-bold hover:from-pink-600 hover:to-amber-600 transition-all duration-300 flex items-center justify-center space-x-2 group"
             >
               <span>View Info</span>
             </button>

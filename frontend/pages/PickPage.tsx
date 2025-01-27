@@ -16,6 +16,27 @@ import { toast } from "@/components/ui/use-toast";
 import { getAllStakes } from "@/view-functions/getStakes";
 import { useFilterStore, applyAllFilters } from "../stores/filterStore";
 
+const CustomLoader = () => (
+  <div className="relative flex items-center justify-center w-16 h-16">
+    {/* Gradient spinning ring */}
+    <div
+      className="absolute w-full h-full border-4 rounded-full animate-spin"
+      style={{
+        borderColor: "transparent",
+        borderTopColor: "#f59e0b", // amber-500
+        borderRightColor: "#ec4899", // pink-500
+        background: "linear-gradient(to right, #f59e0b, #ec4899)",
+        WebkitBackgroundClip: "text",
+      }}
+    ></div>
+
+    {/* Container with P */}
+    <div className="flex items-center justify-center w-10 h-10 bg-gray-900 rounded-lg">
+      <span className="text-2xl font-bold text-amber-500">P</span>
+    </div>
+  </div>
+);
+
 export default function PlayPredictor() {
   const { amountFilter, creator, pair_id } = useFilterStore();
   const [stakes, setStakes] = useState([]);
@@ -74,7 +95,7 @@ export default function PlayPredictor() {
       amountFilter,
       creator,
       pair_id,
-      statusFilter: 'all' // We're handling status through tabs instead
+      statusFilter: "all", // We're handling status through tabs instead
     });
   }, [filteredStakesByTab, amountFilter, creator, pair_id]);
 
@@ -92,22 +113,22 @@ export default function PlayPredictor() {
     {
       value: "all",
       icon: <Globe className="h-5 w-5" />,
-      label: "All Stakes",
+      label: "All Wagers",
     },
     {
       value: "open",
       icon: <Unlock className="h-5 w-5" />,
-      label: "Open Stakes",
+      label: "Open Wagers",
     },
     {
       value: "my_open",
       icon: <ListStart className="h-5 w-5" />,
-      label: "My Open Stakes",
+      label: "My Open Wagers",
     },
     {
       value: "my_stakes",
       icon: <UserRound className="h-5 w-5" />,
-      label: "My Stakes",
+      label: "My Wagers",
     },
   ];
 
@@ -122,12 +143,28 @@ export default function PlayPredictor() {
 
         {/* Tabs */}
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6 ">
-          <TabsList className="grid w-full grid-cols-4 bg-gray-900">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+          <TabsList className="grid w-full grid-cols-4 bg-gray-800/50">
             {tabConfigs.map((tab) => (
-              <TabsTrigger key={tab.value} value={tab.value} className="flex items-center space-x-2">
-                {tab.icon}
-                <span className="hidden sm:inline">{tab.label}</span>
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className={`flex items-center  ${activeTab === tab.value ? "relative group" : ""}`}
+              >
+                {activeTab === tab.value ? (
+                  <>
+                    <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-sm font-bold hover:from-amber-600 hover:to-pink-600 transition-all "></div>
+                    <div className="relative flex items-center space-x-2 text-white rounded-xl px-3  font-medium transition-all">
+                      {tab.icon}
+                      <span className="hidden sm:inline transition-colors">{tab.label}</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {tab.icon}
+                    <span className="ml-2 hidden sm:inline">{tab.label}</span>
+                  </>
+                )}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -136,14 +173,14 @@ export default function PlayPredictor() {
         {/* Loading State */}
         {isLoading && (
           <div className="flex justify-center items-center py-16">
-            <Loader2 className="h-12 w-12 animate-spin text-gray-400" />
+            <CustomLoader  />
           </div>
         )}
 
         {/* Stakes Grid */}
         {!isLoading && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
               {finalFilteredStakes.map((stake) => (
                 <StakeCard key={stake.id} stake={stake} authorizedUser={account} />
               ))}

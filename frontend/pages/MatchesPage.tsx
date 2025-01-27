@@ -21,6 +21,27 @@ const Spinner = () => (
   </div>
 );
 
+const CustomLoader = () => (
+  <div className="relative flex items-center justify-center w-16 h-16">
+    {/* Gradient spinning ring */}
+    <div
+      className="absolute w-full h-full border-4 rounded-full animate-spin"
+      style={{
+        borderColor: "transparent",
+        borderTopColor: "#f59e0b", // amber-500
+        borderRightColor: "#ec4899", // pink-500
+        background: "linear-gradient(to right, #f59e0b, #ec4899)",
+        WebkitBackgroundClip: "text",
+      }}
+    ></div>
+
+    {/* Container with P */}
+    <div className="flex items-center justify-center w-10 h-10 bg-gray-900 rounded-lg">
+      <span className="text-2xl font-bold text-amber-500">P</span>
+    </div>
+  </div>
+);
+
 type Match = {
   id: string;
   matchId: string;
@@ -112,7 +133,7 @@ export default function MatchBetting() {
         .single();
 
       if (stakeError) {
-        throw new Error("Failed to fetch stake information");
+        throw new Error("Failed to fetch Wager information");
       }
 
       // Validate number of selections
@@ -200,7 +221,7 @@ export default function MatchBetting() {
           .single();
 
         if (stakeError) {
-          throw new Error("Failed to fetch stake data");
+          throw new Error("Failed to fetch Wager data");
         }
 
         setIsStakeCompleted(!!stakeData?.is_completed);
@@ -251,7 +272,7 @@ export default function MatchBetting() {
   //   try {
   //     setIsCompleting(true);
 
-  //     // Check if stake exists
+  //     // Check if Wager exists
   //     const { data: stakeData, error: stakeError } = await supabase
   //       .from("stakes")
   //       .select("creator_addr, pairer_addr, is_completed")
@@ -365,15 +386,15 @@ export default function MatchBetting() {
         .single();
 
       if (stakeError) {
-        throw new Error("Stake not found");
+        throw new Error("Wager not found");
       }
 
-      // Check if stake is already completed
+      // Check if Wager is already completed
       if (stakeData.is_completed) {
         setIsStakeCompleted(true);
         toast({
           title: "Notice",
-          description: "This stake has already been completed.",
+          description: "This Wager has already been completed.",
         });
         return;
       }
@@ -397,7 +418,7 @@ export default function MatchBetting() {
 
       if (!result.completed) {
         toast({
-          title: "Cannot Complete Stake",
+          title: "Cannot Complete Wager",
           description: result.message,
           variant: "destructive",
         });
@@ -410,7 +431,7 @@ export default function MatchBetting() {
         transactionHash: committedTransaction.hash,
       });
 
-      // Update the stake status in the database
+      // Update the Wager status in the database
       const { error: updateError } = await supabase
         .from("stakes")
         .update({
@@ -420,7 +441,7 @@ export default function MatchBetting() {
         .eq("stake_id", Number(id));
 
       if (updateError) {
-        throw new Error("Failed to update stake winner");
+        throw new Error("Failed to update Wager winner");
       }
 
       setIsStakeCompleted(true);
@@ -430,14 +451,14 @@ export default function MatchBetting() {
         description: result.message,
       });
 
-      // navigate(`/stake/${id}/results`);
+      // navigate(`/Wager/${id}/results`);
     } catch (error: any) {
       toast({
         title: "Error",
-        description: `Failed to complete stake: ${error}`,
+        description: `Failed to complete Wager: ${error}`,
         variant: "destructive",
       });
-      console.error("Complete stake error:", error);
+      console.error("Complete Wager error:", error);
     } finally {
       setIsCompleting(false);
     }
@@ -511,18 +532,18 @@ export default function MatchBetting() {
                   <span className="whitespace-nowrap">Refresh Scores</span>
                 </button> */}
 
-                {/* Complete Stake Button - Full width on mobile, auto on larger screens */}
+                {/* Complete Wager Button - Full width on mobile, auto on larger screens */}
                 <button
                   onClick={completeStake}
                   disabled={isCompleting}
-                  className="flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-500 rounded-md text-sm font-medium transition-colors disabled:opacity-50 w-full sm:w-auto"
+                  className="flex items-center justify-center px-4 py-2 bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-lg font-semibold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-50 w-full sm:w-auto"
                 >
                   {isCompleting ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   ) : (
                     <Trophy className="h-4 w-4 mr-2" />
                   )}
-                  <span className="whitespace-nowrap">Complete Stake</span>
+                  <span className="whitespace-nowrap">Complete Wager</span>
                 </button>
 
                 {/* Predictions Button */}
@@ -549,7 +570,7 @@ export default function MatchBetting() {
         {/* Loading State */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <Spinner />
+            <CustomLoader  />
           </div>
         ) : error ? (
           // Error State
@@ -557,13 +578,13 @@ export default function MatchBetting() {
         ) : isStakeCompleted ? (
           <div className="flex flex-col items-center justify-center h-[calc(100vh-76px)]">
             <CheckCircle2 className="h-16 w-16 text-green-500 mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Stake Completed</h2>
-            <p className="text-gray-600 text-center max-w-md mb-6">
-              This stake has been completed and the results have been finalized.
+            <h2 className="text-2xl font-semibold text-white mb-2">Wager Completed</h2>
+            <p className="text-gray-500 text-center max-w-md mb-6">
+              This Wager has been completed and the results have been finalized.
             </p>
             <Link
               to="/super-picks"
-              className="inline-flex items-center px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 hover:bg-gray-700 transition-colors hover:text-white"
             >
               Return to Wager Listings
             </Link>

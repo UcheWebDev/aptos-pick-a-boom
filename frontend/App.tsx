@@ -30,7 +30,7 @@ const router = createBrowserRouter(
       <Route path="/history" element={<HistoryPage />} />
       <Route path="/wallet" element={<WalletPage />} />
       <Route path="/how-to-play" element={<HowTo />} />
-      <Route path="/stakings" element={<Layout><StakingPage /></Layout>} />
+      <Route path="/wager" element={<Layout><StakingPage /></Layout>} />
       <Route path="/matches-page/:id" element={<MatchesPage />} />
     </>,
   ),

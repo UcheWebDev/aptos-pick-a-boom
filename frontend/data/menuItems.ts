@@ -16,7 +16,7 @@ import {
 
 export const menuItems: MenuItem[] = [
   { icon: Home, label: "Home", path: "/" },
-  { icon: Target, label: "Stake", path: "/stakings" },
+  { icon: Target, label: "Create Wager", path: "/wager" },
   { icon: Coins, label: "Listings", path: "/super-picks" },
   // { icon: HelpCircle, label: "How to Play", path: "/how-to-play" },
   // { icon: Trophy, label: "Leaderboard" },

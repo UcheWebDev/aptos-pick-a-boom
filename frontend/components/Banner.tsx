@@ -74,12 +74,12 @@ const MicroBettingBanner = ({ stake = [] }) => {
 
   return (
     <div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div className="relative group">
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 rounded-2xl animate-pulse blur-sm"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500  animate-pulse blur-sm"></div>
 
-          <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 border border-amber-500/20">
-            <div className="absolute inset-0 overflow-hidden rounded-xl opacity-20 pointer-events-none">
+          <div className="relative bg-gradient-to-br from-gray-900 to-gray-800  p-6 border border-amber-500/20">
+            <div className="absolute inset-0 overflow-hidden  opacity-20 pointer-events-none">
               <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
               <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent"></div>
               <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>
@@ -93,7 +93,7 @@ const MicroBettingBanner = ({ stake = [] }) => {
                 </div>
               </div>
               <div>
-                <p className="text-gray-400">Total Value Staked</p>
+                <p className="text-gray-400">Total Contract Wagers</p>
                 <h3 className="text-2xl font-bold text-white">
                   {typeof totalStaked === "number" ? totalStaked.toFixed(2) : "0.00"} APT
                 </h3>
@@ -110,10 +110,10 @@ const MicroBettingBanner = ({ stake = [] }) => {
         </div>
 
         <div className="relative group">
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 rounded-2xl animate-pulse blur-sm"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500  animate-pulse blur-sm"></div>
 
-          <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 border border-amber-500/20">
-            <div className="absolute inset-0 overflow-hidden rounded-xl opacity-20 pointer-events-none">
+          <div className="relative bg-gradient-to-br from-gray-900 to-gray-800  p-6 border border-amber-500/20">
+            <div className="absolute inset-0 overflow-hidden  opacity-20 pointer-events-none">
               <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
               <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent"></div>
               <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>
@@ -141,10 +141,10 @@ const MicroBettingBanner = ({ stake = [] }) => {
         </div>
 
         <div className="relative group">
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 rounded-2xl animate-pulse blur-sm"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500  animate-pulse blur-sm"></div>
 
-          <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 border border-amber-500/20">
-            <div className="absolute inset-0 overflow-hidden rounded-xl opacity-20 pointer-events-none">
+          <div className="relative bg-gradient-to-br from-gray-900 to-gray-800  p-6 border border-amber-500/20">
+            <div className="absolute inset-0 overflow-hidden  opacity-20 pointer-events-none">
               <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
               <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent"></div>
               <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>

@@ -180,14 +180,14 @@ export default function BettingForm() {
     // Amount validation
     const numAmount = parseFloat(amount);
     if (!amount) {
-      newErrors.amount = "Please enter a stake amount";
+      newErrors.amount = "Please enter a Wager amount";
     } else if (isUsdMode) {
       const aptosEquivalent = usdToAptos(numAmount);
       if (!aptosEquivalent || aptosEquivalent < 0.1) {
-        newErrors.amount = "Minimum stake amount is 0.1 APT";
+        newErrors.amount = "Minimum Wager amount is 0.1 APT";
       }
     } else if (numAmount < 0.1) {
-      newErrors.amount = "Minimum stake amount is 0.1 APT";
+      newErrors.amount = "Minimum Wager amount is 0.1 APT";
     }
 
     // Match selection validation
@@ -270,7 +270,7 @@ export default function BettingForm() {
       if (stakeError) {
         toast({
           title: "Error",
-          description: `Error recording stake to DB`,
+          description: `Error recording Wager to DB`,
         });
       }
 
@@ -390,7 +390,7 @@ export default function BettingForm() {
         {/* Amount Input */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-gray-400">Stake Amount</label>
+            <label className="block text-sm font-medium text-gray-400">Wager Amount</label>
             <button onClick={toggleCurrency} className="text-sm text-amber-500 hover:text-amber-600 flex items-center">
               <DollarSign className="h-4 w-4 mr-1" />
               Switch to {isUsdMode ? "APT" : "USD"}
@@ -439,7 +439,7 @@ export default function BettingForm() {
               onClick={openMatchesDialog}
               className="text-sm text-amber-500 hover:text-amber-600 flex items-center"
             >
-              available games ({matchesCount})
+              Choose Matches ({matchesCount})
             </button>
           </div>
           <div className="relative">
@@ -506,9 +506,9 @@ export default function BettingForm() {
         <button
           onClick={handleSubmit}
           disabled={!connected}
-          className={`w-full  py-4 rounded-full
+          className={`w-full  py-4
            font-bold  transition-colors 
-           ${!connected ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group"}`}
+           ${!connected ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group"}`}
         >
           Place
         </button>
@@ -526,11 +526,11 @@ export default function BettingForm() {
       >
         <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-md rounded-lg bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl border border-gray-700">
           <AlertDialogHeader className="space-y-3">
-          <AlertDialogTitle className="text-center text-lg text-amber-500">Confirm Your Wager</AlertDialogTitle>
+            <AlertDialogTitle className="text-center text-lg text-amber-500">Confirm Your Wager</AlertDialogTitle>
             <div className="space-y-4 pt-2">
               <div className="border-b pb-4">
                 <div className="flex justify-between mb-2 text-sm sm:text-base">
-                  <span className="text-gray-400">Stake Amount:</span>
+                  <span className="text-gray-400">Wager Amount:</span>
                   <span className="text-white font-semibold">{formatAmount(parseFloat(amount))}</span>
                 </div>
                 <div className="flex justify-between mb-2 text-sm sm:text-base">
@@ -552,7 +552,7 @@ export default function BettingForm() {
           <AlertDialogFooter className="flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 mt-4">
             <AlertDialogCancel
               onClick={cancelHandleConfirmBet}
-              className="w-full sm:w-1/2 mt-0"
+              className="w-full sm:w-1/2 mt-0  px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 hover:bg-gray-700 hover:text-white transition-colors"
               disabled={isProcessingTransaction}
             >
               Cancel
@@ -578,7 +578,7 @@ export default function BettingForm() {
               </div>
             </div>
             <AlertDialogHeader>
-            <AlertDialogTitle className="text-center text-amber-500">Stake Placed!</AlertDialogTitle>
+              <AlertDialogTitle className="text-center text-amber-500">Wager Placed!</AlertDialogTitle>
               <div className="text-center">
                 <p className="text-sm text-gray-400 mt-1 truncate" title={txHash}>
                   Transaction hash: {truncateHash(txHash)}
@@ -596,7 +596,7 @@ export default function BettingForm() {
 
       {/* Matches Dialog */}
       <Dialog open={isMatchesDialogOpen} onOpenChange={setIsMatchesDialogOpen}>
-        <DialogContent className="w-[95%] bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl border border-gray-700">
+        <DialogContent className="w-[95%] bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl border border-gray-700 ">
           <DialogHeader>
             <DialogTitle>{/* Title content */}</DialogTitle>
           </DialogHeader>
@@ -613,8 +613,12 @@ export default function BettingForm() {
             />
           </div>
 
-          <DialogFooter className="flex flex-row space-x-2 mt-4">
-            <Button variant="outline" className="w-full sm:w-1/2 " onClick={() => setIsMatchesDialogOpen(false)}>
+          <DialogFooter className="flex flex-row space-x-2">
+            <Button
+              variant="outline"
+              className="w-full sm:w-1/2  px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 hover:bg-gray-700 transition-colors hover:text-white"
+              onClick={() => setIsMatchesDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button
