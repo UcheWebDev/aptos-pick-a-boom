@@ -221,32 +221,32 @@ export default function BettingForm() {
       setisLoading(true);
       setIsProcessingTransaction(true); // Set processing state to true
 
-      const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-states`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          selected_matches: selectedMatches.map((s) => s.matchId),
-        }),
-      });
+      // const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-states`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     selected_matches: selectedMatches.map((s) => s.matchId),
+      //   }),
+      // });
 
-      if (!response.ok) {
-        throw new Error("Failed to verify match states");
-      }
+      // if (!response.ok) {
+      //   throw new Error("Failed to verify match states");
+      // }
 
-      const stateCheck = await response.json();
+      // const stateCheck = await response.json();
 
-      if (!stateCheck.valid) {
-        toast({
-          title: "Cannot Save Predictions",
-          description: `${stateCheck.invalidCount} match${stateCheck.invalidCount > 1 ? "es have" : " has"} already started or finished. Please refresh and try again.`,
-          variant: "destructive",
-        });
-        setisLoading(false);
-        setIsProcessingTransaction(false);
-        return;
-      }
+      // if (!stateCheck.valid) {
+      //   toast({
+      //     title: "Cannot Save Predictions",
+      //     description: `${stateCheck.invalidCount} match${stateCheck.invalidCount > 1 ? "es have" : " has"} already started or finished. Please refresh and try again.`,
+      //     variant: "destructive",
+      //   });
+      //   setisLoading(false);
+      //   setIsProcessingTransaction(false);
+      //   return;
+      // }
 
       const pairId = await generateUniquePairId();
       const amountInOctas = Math.floor(parseFloat(amount) * 100000000);
@@ -508,7 +508,7 @@ export default function BettingForm() {
           disabled={!connected}
           className={`w-full  py-4
            font-bold  transition-colors 
-           ${!connected ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group"}`}
+           ${!connected ? "bg-gray-300 rounded-lg text-gray-500 cursor-not-allowed" : "bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-lg font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group"}`}
         >
           Place
         </button>

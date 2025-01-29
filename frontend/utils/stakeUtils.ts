@@ -90,6 +90,7 @@ export const parseStakeData = (stake) => {
         amount: formatStakeAmount(stake.amount),
         pairedAmount: stake.paired_amount,
         creator: stake.creator,
+        total_games: stake.total_games,
         createdAt: formatTimeStamp(stake.created_at),
         status: getStakeStatus(stake.status),
         pairedWith: stake.paired_with.vec[0] || null,

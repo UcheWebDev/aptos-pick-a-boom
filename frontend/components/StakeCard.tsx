@@ -13,7 +13,12 @@ import {
   Trophy,
   Ban,
   CircuitBoard,
-  Zap,
+  TrendingUp,
+  Wallet,
+  Clock,
+  ChevronRight,
+  Crown,
+  Dices,
   MousePointerClick,
 } from "lucide-react";
 import Modal from "./Modal";
@@ -112,6 +117,7 @@ export function StakeCard({ stake, authorizedUser }) {
 
   const currentTime = new Date().getTime();
   const showStakeTime = stake.selectedTime;
+  const winningAmount = parseFloat(stake.amount) * 2;
 
   const handleSubmit = () => {
     setIsPairDialogOpen(true);
@@ -374,23 +380,11 @@ export function StakeCard({ stake, authorizedUser }) {
 
   return (
     <div className="">
-      <div className="relative group">
-        {/* Animated border effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 rounded-2xl animate-pulse blur"></div>
-
-        <div className="relative bg-gray-900 rounded-2xl p-6 border border-amber-500/20 backdrop-blur-xl">
-          {/* Decorative circuit lines */}
-          <div className="absolute inset-0 overflow-hidden rounded-2xl opacity-20">
-            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
-            <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent"></div>
-            <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>
-            <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500 to-transparent"></div>
-          </div>
-
+      {/* <div className="relative group">
+        <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 border border-gray-700 rounded-2xl backdrop-blur-xl">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="absolute inset-0 bg-amber-500 blur-md rounded-lg"></div>
                 <div className="relative bg-gray-900 p-3 rounded-lg border border-amber-500">
                   <CircuitBoard className="w-6 h-6 text-amber-400" />
                 </div>
@@ -408,7 +402,6 @@ export function StakeCard({ stake, authorizedUser }) {
             </div>
           </div>
 
-          {/* Rest of the component remains the same */}
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-gray-800/50 rounded-lg p-4 border border-amber-500/20 group-hover:border-amber-500/40 transition-colors">
@@ -423,7 +416,7 @@ export function StakeCard({ stake, authorizedUser }) {
 
             <div className="relative">
               <div className="absolute inset-0 bg-amber-500/5 blur-md rounded-lg"></div>
-              <div className="relative bg-gray-800/50 rounded-lg p-4 border border-amber-500/20">
+              <div className="relative rounded-lg p-4 border border-amber-500/20">
                 <div className="flex justify-between items-center">
                   <span className="text-amber-400/60">Wager Amount</span>
                   <span className="text-white font-mono font-bold">{stake.amount} APT</span>
@@ -432,22 +425,9 @@ export function StakeCard({ stake, authorizedUser }) {
             </div>
           </div>
 
-          {/* <button className="relative w-full mt-6 group">
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-pink-500 to-pink-500 rounded-xl blur group-hover:blur-md transition-all"></div>
-            <div className="relative bg-gray-900 text-white py-3 rounded-xl font-medium group-hover:bg-gray-900/50 transition-all flex items-center justify-center gap-2">
-              <span className="group-hover:text-amber-400 transition-colors">Stake Now</span>
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </button> */}
           <div className="flex gap-2 pt-2 mt-6">
             {isUserAuthorizedToComplete && !isPaired && !isCompleted ? (
               <>
-                {/* <button
-                  onClick={() => setIsDetailsDialogOpen(true)}
-                  className="flex-1 px-4 py-2.5 border border-gray-200 rounded-full text-gray-400 font-medium transition-colors duration-200"
-                >
-                  View Details
-                </button> */}
                 <button className="relative w-full group" onClick={() => setIsDetailsDialogOpen(true)}>
                   <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-pink-500 to-pink-500 rounded-xl blur transition-all"></div>
                   <div className="relative bg-gray-900 text-white py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2">
@@ -455,12 +435,7 @@ export function StakeCard({ stake, authorizedUser }) {
                     <span className="transition-colors"> View Details</span>
                   </div>
                 </button>
-                {/* <button
-                  onClick={() => onUnstakeStake()}
-                  className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-full font-medium transition-colors hover:bg-red-700 shadow-sm hover:shadow"
-                >
-                  Unstake
-                </button> */}
+
                 <button className="relative w-full group" onClick={() => onUnstakeStake()}>
                   <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-pink-500 to-pink-500 rounded-xl blur transition-all"></div>
                   <div className="relative bg-gray-900 text-white py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2">
@@ -507,6 +482,119 @@ export function StakeCard({ stake, authorizedUser }) {
               </>
             )}
           </div>
+        </div>
+      </div> */}
+      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 border border-gray-700">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-3">
+            <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
+              <div className="bg-gray-900 p-2 rounded-lg">
+                <CircuitBoard className="w-5 h-5 text-amber-500" />
+              </div>
+            </div>
+            <div>
+              <h3 className="text-base sm:text-lg font-semibold text-white"> {formatAddress(stake.creator)}</h3>
+              <p className="text-sm text-gray-400">Staker</p>
+            </div>
+          </div>
+          <div className="bg-green-400/10 px-3 py-1 rounded-full">
+            <span className="text-green-400 font-medium text-sm">{stake.pair_id}</span>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="space-y-4 mb-6">
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="flex items-center space-x-2 mb-1">
+                  <Crown className="w-4 h-4 text-amber-500" />
+                  <span className="text-sm text-gray-400">Pot . Win</span>
+                </div>
+                <span className="text-lg font-semibold text-white">{winningAmount} APT</span>
+              </div>
+              <div>
+                <div className="flex items-center space-x-2 mb-1">
+                  <Dices className="w-4 h-4 text-amber-500" />
+                  <span className="text-sm text-gray-400">Total Matches</span>
+                </div>
+                <span className="text-lg font-semibold text-white">{stake.total_games}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Wager Amount</p>
+                <p className="text-lg font-semibold text-white">{stake.amount} APT</p>
+              </div>
+              <div className="h-8 w-[1px] bg-gray-700"></div>
+              <div>
+                <p className="text-sm text-gray-400">Wager Status</p>
+                <p className="text-lg font-semibold text-white">{stake.status}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Button */}
+        {/* <button className="w-full bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group">
+          <span>Start Earning</span>
+          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </button> */}
+        <div className="flex gap-2 pt-2 mt-6">
+          {isUserAuthorizedToComplete && !isPaired && !isCompleted ? (
+            <>
+              <button className="relative w-full group" onClick={() => setIsDetailsDialogOpen(true)}>
+                <div className="w-full bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group">
+                  <Eye className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <span className="transition-colors"> View Details</span>
+                </div>
+              </button>
+
+              <button className="relative w-full group" onClick={() => onUnstakeStake()}>
+              <div className="w-full bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group">
+                  <Ban className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <span className=" transition-colors"> Unstake</span>
+                </div>
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="relative w-full group" onClick={() => setIsDetailsDialogOpen(true)}>
+                <div className="w-full bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group">
+                  <Eye className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <span className=" transition-colors"> View </span>
+                </div>
+              </button>
+              {isOpen && authorizedUser?.address && authorizedUser?.address !== stake.creator && (
+                <button className="relative w-full group" onClick={handleSubmit}>
+                  <div className="relative bg-gray-800 text-white rounded-lg border border-amber-500 text-white py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2">
+                    <MousePointerClick className="w-4 h-4 mr-2 text-amber-400" />
+                    <span className="text-amber-400 transition-colors">
+                      {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Pair"}
+                    </span>
+                  </div>
+                </button>
+              )}
+              {isPaired && isUserAuthorizedToComplete && (
+                <button className="relative w-full group" onClick={onCompleteStake} disabled={isCompleting}>
+                  <div className="relative bg-gray-800 text-white rounded-lg border border-amber-500 text-white py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2">
+                    <span className="text-amber-400 transition-colors flex items-center">
+                      {isCompleting ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <Trophy className="h-4 w-4 mr-2" />
+                      )}
+                      Complete
+                    </span>
+                  </div>
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
 
@@ -572,7 +660,7 @@ export function StakeCard({ stake, authorizedUser }) {
         <DialogContent className="sm:max-w-2xl max-h-[90vh] w-[90%] rounded-lg bg-gray-900  border border-gray-700 overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
-              <span className="text-gray-100">Wager Informations</span>
+              <span className="text-gray-100 uppercase">Wager Informations</span>
               {/* <span
                 className={`px-3 py-1 rounded-full text-sm font-medium ${
                   stake.status === "Open" || stake.status === "Completed"
@@ -608,11 +696,11 @@ export function StakeCard({ stake, authorizedUser }) {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-sm text-gray-400">Created By</p>
-                      <p className="font-medium text-gray-400">{formatAddress(stake.creator)}</p>
+                      <p className="font-medium text-white">{formatAddress(stake.creator)}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-400">Amount</p>
-                      <p className="font-medium text-gray-400">{stake.amount} APT</p>
+                      <p className="font-medium text-white">{stake.amount} APT</p>
                     </div>
                   </div>
                 </div>
@@ -623,7 +711,7 @@ export function StakeCard({ stake, authorizedUser }) {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-gray-400">Total Cut</p>
-                        <p className="text-lg font-semibold text-gray-400">{stakeDetails.total_cut}</p>
+                        <p className="text-lg font-semibold text-white">{stakeDetails.total_cut}</p>
                       </div>
                       <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
                         <div className="bg-gray-900 p-2 rounded-lg">
@@ -639,7 +727,7 @@ export function StakeCard({ stake, authorizedUser }) {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-gray-400">Total Picks</p>
-                        <p className="text-lg font-semibold text-gray-400">{stakeDetails.total_picks}</p>
+                        <p className="text-lg font-semibold text-white">{stakeDetails.total_picks}</p>
                       </div>
                       {/* <div className="bg-gray-900 p-2 rounded-full">
                         <Users className="w-5 h-5 text-cyan-400" />
@@ -662,7 +750,7 @@ export function StakeCard({ stake, authorizedUser }) {
                         <CheckCircle className="w-4 h-4 text-green-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-400">Wager Created</p>
+                        <p className="text-sm font-medium text-gray-300">Wager Created</p>
                         {/* <p className="text-sm text-gray-500">{formatDate(stakeDetails.created_at)}</p> */}
                       </div>
                     </div>
@@ -673,7 +761,7 @@ export function StakeCard({ stake, authorizedUser }) {
                           <Users className="w-4 h-4 text-amber-400" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-400">
+                          <p className="text-sm font-medium text-gray-300">
                             Paired by {formatAddress(stakeDetails.pairer_addr)}
                           </p>
                           <p className="text-sm text-gray-500">Wager was paired</p>
@@ -778,7 +866,9 @@ export function StakeCard({ stake, authorizedUser }) {
                 <span className="font-semibold text-white">{stake.amount} APT</span>
               </div>
             </div>
-            <DialogDescription>Are you sure you want to remove this wager ? This action cannot be undone.</DialogDescription>
+            <DialogDescription>
+              Are you sure you want to remove this wager ? This action cannot be undone.
+            </DialogDescription>
           </div>
           <DialogFooter className="flex flex-row gap-2">
             <Button
@@ -789,7 +879,12 @@ export function StakeCard({ stake, authorizedUser }) {
             >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleConfirmUnstake} disabled={isUnstakeLoading} className="w-auto px-4 py-2 bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-lg font-semibold hover:from-amber-600 hover:to-pink-600 transition-all duration-300">
+            <Button
+              variant="destructive"
+              onClick={handleConfirmUnstake}
+              disabled={isUnstakeLoading}
+              className="w-auto px-4 py-2 bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-lg font-semibold hover:from-amber-600 hover:to-pink-600 transition-all duration-300"
+            >
               {isUnstakeLoading ? <SpinButton /> : "Confirm "}
             </Button>
           </DialogFooter>

@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { BookText, Check } from "lucide-react";
+import { BookText, Check, Calendar } from "lucide-react";
 import Flag from "../components/Flag";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 const FixturesSelection = ({
   matches,
@@ -11,6 +14,15 @@ const FixturesSelection = ({
   currentSelection = [],
 }) => {
   const [activeFilter, setActiveFilter] = useState("All");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  const parseMatchDate = (dateStr) => {
+    const year = dateStr.substring(0, 4);
+    const month = dateStr.substring(4, 6);
+    const day = dateStr.substring(6, 8);
+    return new Date(year, month - 1, day);
+  };
 
   const handleMatchSelect = (match) => {
     let newSelection = [...currentSelection];
@@ -31,6 +43,13 @@ const FixturesSelection = ({
     onSelectionChange(newSelection);
   };
 
+  const handleDateSelect = (date) => {
+    if (date) {
+      setSelectedDate(date);
+      setIsCalendarOpen(false);
+    }
+  };
+
   const formatMatchTime = (timeStr) => {
     try {
       const [day, month, year, hours, minutes] = timeStr.split(/[.: ]/);
@@ -40,7 +59,34 @@ const FixturesSelection = ({
     }
   };
 
-  const filteredMatches = activeFilter === "All" ? matches : matches.filter((match) => match.ccode === activeFilter);
+  const getDayLabel = (dateStr) => {
+    const matchDate = parseMatchDate(dateStr);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dayAfterTomorrow = new Date(today);
+    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+
+    const normalizeDate = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const normalizedMatchDate = normalizeDate(matchDate);
+    const normalizedToday = normalizeDate(today);
+    const normalizedTomorrow = normalizeDate(tomorrow);
+    const normalizedDayAfter = normalizeDate(dayAfterTomorrow);
+
+    if (normalizedMatchDate.getTime() === normalizedToday.getTime()) return "Today";
+    if (normalizedMatchDate.getTime() === normalizedTomorrow.getTime()) return "Tomorrow";
+    return format(matchDate, "EEE");
+  };
+
+  const filteredMatches = matches.filter((match) => {
+    const matchDate = parseMatchDate(match.matchTime);
+    const isSameDate =
+      matchDate.getDate() === selectedDate.getDate() &&
+      matchDate.getMonth() === selectedDate.getMonth() &&
+      matchDate.getFullYear() === selectedDate.getFullYear();
+    return (activeFilter === "All" || match.ccode === activeFilter) && isSameDate;
+  });
+
   const uniqueLeagues = ["All", ...new Set(matches.map((match) => match.ccode))];
 
   const TeamLogo = ({ src, teamName }) => (
@@ -71,16 +117,22 @@ const FixturesSelection = ({
         <div className="sticky top-0 bg-gray-950 border-b border-gray-800 p-4 z-10">
           <div className="flex justify-between items-center">
             <CardTitle className="text-lg text-white">Select Matches</CardTitle>
-            <div className="relative">
-              <BookText className="h-5 w-5 text-gray-400" />
-              {currentSelection.length > 0 && (
-                <span
-                  className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full 
-                          min-w-[18px] h-[18px] inline-flex items-center justify-center px-1"
-                >
-                  {currentSelection.length}
-                </span>
-              )}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setIsCalendarOpen(true)}
+                className="flex items-center gap-2 text-gray-400 hover:text-gray-300"
+              >
+                <Calendar className="h-5 w-5" />
+                <span className="text-sm">{format(selectedDate, "dd MMM yyyy")}</span>
+              </button>
+              <div className="relative">
+                <BookText className="h-5 w-5 text-gray-400" />
+                {currentSelection.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full min-w-[18px] h-[18px] inline-flex items-center justify-center px-1">
+                    {currentSelection.length}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -124,7 +176,10 @@ const FixturesSelection = ({
                   </div>
                 )}
 
-                <div className="text-xs font-medium text-center text-gray-400 mb-4">{match.ccode} League</div>
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-xs font-medium text-gray-400">{match.ccode} League</span>
+                  <span className="text-xs font-medium text-gray-400">{getDayLabel(match.matchTime)}</span>
+                </div>
 
                 <div className="grid grid-cols-3 items-center gap-4">
                   <TeamLogo src={match.homeLogo} teamName={match.homeTeam} />
@@ -144,6 +199,22 @@ const FixturesSelection = ({
           )}
         </CardContent>
       </div>
+
+      <Dialog open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+        <DialogContent className="w-[95%] bg-gray-900 border-gray-800 rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-white">Select Date</DialogTitle>
+          </DialogHeader>
+          <div className="p-4 text-center flex justify-center">
+            <CalendarComponent
+              mode="single"
+              selected={selectedDate}
+              onSelect={handleDateSelect}
+              className="rounded-md text-white [&_.rdp-day]:text-white [&_.rdp-day_button:hover]:bg-gray-700 [&_.rdp-day_button:focus]:bg-gray-700 [&_.rdp-button]:text-dark [&_.rdp-nav_button:hover]:bg-gray-700 [&_.rdp-caption]:text-white"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
