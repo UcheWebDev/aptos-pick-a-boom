@@ -1,191 +1,139 @@
-import React, { useState } from "react";
-import { ArrowLeft, Wallet, TrendingUp, Calculator, AlertCircle, CheckCircle, DollarSign } from "lucide-react";
-import { useAptosBalance } from "@/hooks/useAptosBalance";
-import { useAptosPriceConverter } from "../hooks/useAptosPriceConverter";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { Link } from "react-router-dom";
-import Modal from "./Modal";
-import Nav from "./Nav";
-import Sidebar from "./Sidebar";
-
-const presetAmounts = [100, 500, 1000, 5000, 10000];
-const cutPresets = [
-  { label: "Cut 1", multiplier: 1.2 },
-  { label: "Cut 2", multiplier: 1.5 },
-  { label: "Cut 3", multiplier: 2.0 },
-];
-
-export default function BettingForm() {
-  const [amount, setAmount] = useState<string>("");
-  const [isUsdMode, setIsUsdMode] = useState(false);
-  const [multiplier, setMultiplier] = useState<number>(1.5);
-  const [errors, setErrors] = useState<{ amount?: string }>({});
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const { connected, account } = useWallet();
-  const { formattedBalance, isLoading: balanceLoading, isError: balanceError } = useAptosBalance(account);
-  const { aptosToUsd, usdToAptos, loading: priceLoading, error: priceError } = useAptosPriceConverter();
-
-  const handleAmountChange = (value: string) => {
-    setAmount(value);
-    setErrors({});
-  };
-
-  const toggleCurrency = () => {
-    if (amount) {
-      const numAmount = parseFloat(amount);
-      if (isUsdMode) {
-        const aptosAmount = usdToAptos(numAmount);
-        setAmount(aptosAmount ? aptosAmount.toFixed(6) : "");
-      } else {
-        const usdAmount = aptosToUsd(numAmount);
-        setAmount(usdAmount ? usdAmount.toFixed(2) : "");
-      }
-    }
-    setIsUsdMode(!isUsdMode);
-  };
-
-  const getDisplayAmount = (value: number): string => {
-    if (isUsdMode) {
-      const usdAmount = aptosToUsd(value);
-      return usdAmount ? `$${usdAmount.toFixed(2)}` : "...";
-    }
-    return `${value} APT`;
-  };
-
-  const potentialWinnings = parseFloat(amount || "0") * multiplier;
-  const availableBalance = 50000; // Replace with actual balance conversion
-
-  const validateForm = () => {
-    const newErrors: { amount?: string } = {};
-    const numAmount = parseFloat(amount);
-
-    if (!amount) {
-      newErrors.amount = "Please enter a stake amount";
-    } else if (isUsdMode) {
-      const aptosEquivalent = usdToAptos(numAmount);
-      if (!aptosEquivalent || aptosEquivalent < 0.1) {
-        newErrors.amount = "Minimum stake amount is 0.1 APT";
-      }
-    } else if (numAmount < 0.1) {
-      newErrors.amount = "Minimum stake amount is 0.1 APT";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = () => {
-    if (validateForm()) {
-      // Convert USD to APT if in USD mode before submitting
-      if (isUsdMode) {
-        const aptosAmount = usdToAptos(parseFloat(amount));
-        if (aptosAmount) {
-          setAmount(aptosAmount.toFixed(6));
-        }
-      }
-      setIsModalOpen(true);
-    }
-  };
-
-  const handleConfirmBet = () => {
-    setIsModalOpen(false);
-    setShowSuccess(true);
-    setAmount("");
-    setMultiplier(1.5);
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Nav toggleSidebar={() => setIsSidebarOpen(true)} />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
-      <div className="bg-blue-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-4">
-            <div className="flex items-center space-x-4">
-              <Link to="/" className="flex items-center text-white hover:text-blue-200">
-                <ArrowLeft className="h-5 w-5 mr-2" />
-                Back
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg p-6">
-          <div className="p-4 bg-gray-50 rounded-lg mb-6">
+  {connected ? (
+          <div className="bg-gray-800/50 rounded-lg p-4 mb-6 border border-gray-700">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Wallet className="h-5 w-5 text-gray-600 mr-2" />
-                <span className="text-gray-600">Balance</span>
+                <Wallet className="h-5 w-5 text-amber-500 mr-2" />
+                <span className="text-sm text-gray-500"> {formattedBalance} APT</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="font-bold">{formattedBalance}</span>
-                {!priceLoading && !priceError && (
-                  <span className="text-sm text-gray-500">
-                    (${aptosToUsd(parseFloat(formattedBalance))?.toFixed(2)})
-                  </span>
-                )}
-              </div>
+              {!priceLoading && !priceError && (
+                <span className="text-sm text-gray-500">(${aptosToUsd(parseFloat(formattedBalance))?.toFixed(2)})</span>
+              )}
             </div>
           </div>
+        ) : null}
 
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-gray-700">Stake Amount</label>
+        {/* Amount Input */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium text-gray-400">Wager Amount</label>
+            <button onClick={toggleCurrency} className="text-sm text-amber-500 hover:text-amber-600 flex items-center">
+              <DollarSign className="h-4 w-4 mr-1" />
+              Switch to {isUsdMode ? "APT" : "USD"}
+            </button>
+          </div>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              {isUsdMode ? "$" : "APT"}
+            </span>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => handleAmountChange(e.target.value)}
+              className={`w-full pl-12 pr-4 py-3 text-white bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-amber-500 ${
+                errors.amount ? "border-red-500" : ""
+              }`}
+              placeholder={`Total amount in ${isUsdMode ? "USD" : "APT"}`}
+            />
+          </div>
+          {errors.amount && (
+            <p className="mt-1 text-sm text-red-600 flex items-center">
+              <AlertCircle className="h-4 w-4 mr-1" />
+              {errors.amount}
+            </p>
+          )}
+
+          {/* Preset Amounts */}
+          <div className="grid grid-cols-4 gap-2 mt-3">
+            {presetAmounts.map((preset) => (
               <button
-                onClick={toggleCurrency}
-                className="text-sm text-blue-600 hover:text-blue-700 flex items-center"
+                key={preset}
+                onClick={() => handleAmountChange(preset.toString())}
+                className="px-2 py-1 text-sm bg-gray-800/50 text-gray-400 border border-gray-700 rounded hover:bg-gray-700 transition-colors"
               >
-                <DollarSign className="h-4 w-4 mr-1" />
-                Switch to {isUsdMode ? "APT" : "USD"}
+                {getDisplayAmount(preset)}
               </button>
-            </div>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                {isUsdMode ? "$" : "APT"}
-              </span>
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => handleAmountChange(e.target.value)}
-                className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.amount ? "border-red-500" : ""
-                }`}
-                placeholder={`Enter amount in ${isUsdMode ? "USD" : "APT"}`}
-              />
-            </div>
-            {errors.amount && (
-              <p className="mt-1 text-sm text-red-600 flex items-center">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                {errors.amount}
-              </p>
-            )}
+            ))}
+          </div>
+        </div>
 
-            <div className="grid grid-cols-5 gap-2 mt-3">
-              {presetAmounts.map((preset) => (
-                <button
-                  key={preset}
-                  onClick={() => handleAmountChange(preset.toString())}
-                  className="px-2 py-1 text-sm border rounded hover:bg-gray-50 transition-colors"
-                >
-                  {getDisplayAmount(preset)}
-                </button>
-              ))}
-            </div>
+        {/* Amount Input */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium text-gray-400">Total Picks</label>
+            <button
+              onClick={openMatchesDialog}
+              className="text-sm text-amber-500 hover:text-amber-600 flex items-center"
+            >
+              Choose Matches ({matchesCount})
+            </button>
+          </div>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+              <Aperture className="h-4 w-4 mr-1" />
+            </span>
+            <input
+              type="number"
+              value={totalGames}
+              onChange={(e) => handleTotalGamesChange(e.target.value)}
+              className={`w-full pl-12 pr-4 py-3 text-white bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-amber-500 ${
+                errors.totalGames ? "border-red-500" : ""
+              }`}
+              placeholder="Total number of games"
+              readOnly={true}
+            />
+          </div>
+          {errors.totalGames && (
+            <p className="mt-1 text-sm text-red-600 flex items-center">
+              <AlertCircle className="h-4 w-4 mr-1" />
+              {errors.totalGames}
+            </p>
+          )}
+        </div>
+
+        {/* Multiplier Section */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <label className="text-sm font-medium text-gray-400">Flex (coming soon)</label>
           </div>
 
-          {/* Rest of the component remains the same */}
-          {/* ... */}
+          {/* Cut Presets */}
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            {cutPresets.map((preset, index) => (
+              <button
+                key={preset.label}
+                onClick={() => handleCutPresetToggle(preset.multiplier)}
+                disabled={true}
+                className={`px-4 py-2 rounded-lg  text-sm font-medium transition-colors ${
+                  selectedCutPreset === preset.multiplier
+                    ? "bg-blue-600 text-white"
+                    : " bg-gray-800/50 text-gray-400 border border-gray-700 rounded hover:bg-gray-700"
+                }`}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Modals remain the same */}
-      {/* ... */}
-    </div>
-  );
-}
+        {/* Summary */}
+        <div className="bg-gray-900 rounded-lg p-4 mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center text-gray-400">
+              <Calculator className="h-5 w-5 mr-2" />
+              <span>Potential Win</span>
+            </div>
+            <span className="font-bold text-green-600">{getFormattedPotentialWinnings()}</span>
+          </div>
+          <div className="text-xs text-gray-400">*Final payout is 1x of wager amount</div>
+        </div>
+
+        {/* Place Bet Button */}
+        <button
+          onClick={handleSubmit}
+          disabled={!connected}
+          className={`w-full  py-4
+           font-bold  transition-colors 
+           ${!connected ? "bg-gray-300 rounded-lg text-gray-500 cursor-not-allowed" : "bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-lg font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group"}`}
+        >
+          Place
+        </button>
