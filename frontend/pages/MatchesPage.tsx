@@ -1,76 +1,21 @@
+// MatchBetting.tsx
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-
-import { ArrowLeft, Timer, Info, CheckCircle2, Loader2, Check, X, BookText, RefreshCw, Trophy } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, Timer, Info, CheckCircle2, Loader2, BookText, RefreshCw, Trophy } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
-import Flag from "../components/Flag";
-import { supabase } from "@/lib/supabase";
-import Modal from "../components/Modal";
+import SelectionDialog from "@/components/SelectionDialog";
+
 import { useToast } from "@/components/ui/use-toast";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-
+import { supabase } from "@/lib/supabase";
 import { confirmFunc } from "@/entry-functions/confirmFunc";
 import { aptosClient } from "@/utils/aptosClient";
-
-// Spinner Component
-const Spinner = () => (
-  <div className="flex justify-center items-center h-full">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
-  </div>
-);
-
-const CustomLoader = () => (
-  <div className="relative flex items-center justify-center w-16 h-16">
-    {/* Gradient spinning ring */}
-    <div
-      className="absolute w-full h-full border-4 rounded-full animate-spin"
-      style={{
-        borderColor: "transparent",
-        borderTopColor: "#f59e0b", // amber-500
-        borderRightColor: "#ec4899", // pink-500
-        background: "linear-gradient(to right, #f59e0b, #ec4899)",
-        WebkitBackgroundClip: "text",
-      }}
-    ></div>
-
-    {/* Container with P */}
-    <div className="flex items-center justify-center w-10 h-10 bg-gray-900 rounded-lg">
-      <span className="text-2xl font-bold text-amber-500">P</span>
-    </div>
-  </div>
-);
-
-type Match = {
-  id: string;
-  matchId: string;
-  matchTime: string;
-  league: string;
-  ccode: string;
-  homeTeam: string;
-  awayTeam: string;
-  homeLogo: string;
-  awayLogo: string;
-  live: boolean;
-  started: boolean;
-  finished: boolean;
-  cancelled: boolean;
-  homeScore?: number;
-  awayScore?: number;
-};
-
-type Selection = {
-  matchId: string;
-  prediction: "home" | "draw" | "away";
-  homeTeam: string;
-  awayTeam: string;
-};
-
-type ExistingSelection = {
-  match_id: string;
-  prediction: "home" | "draw" | "away";
-};
+import { Match, Selection, ExistingSelection, getResultText } from "../types/types";
+import MatchCard from "@/components/MatchCard";
+import MatchResults from "@/components/MatchResults";
+import { CustomLoader } from "@/components/CustomLoader";
 
 export default function MatchBetting() {
   const [selections, setSelections] = useState<Selection[]>([]);
@@ -80,31 +25,45 @@ export default function MatchBetting() {
   const [error, setError] = useState<string | null>(null);
   const [showPredictionsModal, setShowPredictionsModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
   const [isStakeCompleted, setIsStakeCompleted] = useState(false);
-  const { connected, account, signAndSubmitTransaction } = useWallet();
+  const [marketType, setMarketType] = useState("outcome"); // New state for market type
+  const [resultData, setResultData] = useState(null);
 
+  const { connected, account, signAndSubmitTransaction } = useWallet();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { id } = useParams(); // URL path parameter
+  const { id } = useParams();
 
+  // Rest of your existing functions (toggleSelection, saveSelections, completeStake, etc.)
+  // Make sure to update them to handle the new market type
   const toggleSelection = (
     matchId: string,
-    prediction: "home" | "draw" | "away",
+    prediction: "home" | "draw" | "away" | "over" | "under",
     homeTeam: string,
     awayTeam: string,
   ) => {
     setSelections((prev) => {
       const exists = prev.find((s) => s.matchId === matchId);
+
+      // If this match already has a selection
       if (exists) {
+        // If clicking the same prediction, remove it
         if (exists.prediction === prediction) {
           return prev.filter((s) => s.matchId !== matchId);
         }
-        return prev.map((s) => (s.matchId === matchId ? { matchId, prediction, homeTeam, awayTeam } : s));
+        // If clicking a different prediction, update it
+        return prev.map((s) => (s.matchId === matchId ? { ...s, prediction } : s));
       }
+
+      // Add new selection
       return [...prev, { matchId, prediction, homeTeam, awayTeam }];
     });
+  };
+
+  const handleMarketTypeChange = (newMarketType: string) => {
+    setMarketType(newMarketType);
+    setSelections([]); // Clear selections when changing market type
   };
 
   const getResultText = (prediction: "home" | "draw" | "away", homeTeam: string, awayTeam: string) => {
@@ -162,7 +121,6 @@ export default function MatchBetting() {
 
       const stateCheck = await response.json();
 
-      // If any matches are invalid (started/finished/cancelled), prevent saving
       if (!stateCheck.valid) {
         toast({
           title: "Cannot Save Predictions",
@@ -224,7 +182,27 @@ export default function MatchBetting() {
           throw new Error("Failed to fetch Wager data");
         }
 
-        setIsStakeCompleted(!!stakeData?.is_completed);
+        if (stakeData?.is_completed) {
+          const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-results`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              stake_id: Number(id),
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to check match results");
+          }
+
+          const result = await response.json();
+          setResultData(result);
+          setIsStakeCompleted(true);
+        }
+
+        // setIsStakeCompleted(!!stakeData?.is_completed);
 
         if (!stakeData?.selected_matches || !stakeData.selected_matches.length) {
           setMatches([]);
@@ -263,114 +241,6 @@ export default function MatchBetting() {
       fetchMatchesAndSelections();
     }
   }, [account]);
-
-  const refreshScores = async () => {};
-
-  // const completeStake = async () => {
-  //   if (isCompleting) return;
-
-  //   try {
-  //     setIsCompleting(true);
-
-  //     // Check if Wager exists
-  //     const { data: stakeData, error: stakeError } = await supabase
-  //       .from("stakes")
-  //       .select("creator_addr, pairer_addr, is_completed")
-  //       .eq("stake_id", Number(id))
-  //       .single();
-
-  //     if (stakeError) {
-  //       throw new Error("Stake not found");
-  //     }
-
-  //     if (stakeData.is_completed) {
-  //       setIsStakeCompleted(true);
-  //       toast({
-  //         title: "Notice",
-  //         description: "This stake has already been completed.",
-  //       });
-  //       return;
-  //     }
-
-  //     // Get all selections for this stake
-  //     const { data: selectionsData, error: selectionsError } = await supabase
-  //       .from("selections")
-  //       .select("match_id, prediction")
-  //       .eq("stake_id", Number(id));
-
-  //     if (selectionsError) {
-  //       throw new Error("Failed to fetch selections");
-  //     }
-
-  //     // Get match results
-  //     const matchIds = selectionsData.map((s) => s.match_id);
-
-  //     const { data: matchesData, error: matchesError } = await supabase
-  //       .from("matches")
-  //       .select("id, homeScore, awayScore")
-  //       .in("id", matchIds);
-
-  //     if (matchesError) {
-  //       throw new Error("Failed to fetch match results");
-  //     }
-
-  //     // Calculate correct predictions
-  //     let correctPredictions = 0;
-  //     const totalPredictions = selectionsData.length;
-
-  //     selectionsData.forEach((selection) => {
-  //       const match = matchesData.find((m) => m.id === selection.match_id);
-  //       if (match && match.homeScore !== null && match.awayScore !== null) {
-  //         let actualResult;
-  //         if (match.homeScore > match.awayScore) {
-  //           actualResult = "home";
-  //         } else if (match.homeScore < match.awayScore) {
-  //           actualResult = "away";
-  //         } else {
-  //           actualResult = "draw";
-  //         }
-
-  //         if (selection.prediction === actualResult) {
-  //           correctPredictions++;
-  //         }
-  //       }
-  //     });
-
-  //     // Determine winner
-  //     const winningAddress = correctPredictions > totalPredictions / 2 ? stakeData.pairer_addr : stakeData.creator_addr;
-
-  //     // Update stake with winner
-  //     const { error: updateError } = await supabase
-  //       .from("stakes")
-  //       .update({
-  //         winner_addr: winningAddress,
-  //         is_completed: true,
-  //       })
-  //       .eq("stake_id", Number(id));
-
-  //     if (updateError) {
-  //       throw new Error("Failed to update stake winner");
-  //     }
-
-  //     setIsStakeCompleted(true);
-
-  //     toast({
-  //       title: "Success",
-  //       description: `Stake completed successfully! Winner determined.`,
-  //     });
-
-  //     // Redirect to results page
-  //   } catch (error: any) {
-  //     toast({
-  //       title: "Error",
-  //       description: `Failed to complete stake: ${error.message}`,
-  //       variant: "destructive",
-  //     });
-  //     console.error("Complete stake error:", error);
-  //   } finally {
-  //     setIsCompleting(false);
-  //   }
-  // };
 
   const completeStake = async () => {
     if (isCompleting) return;
@@ -450,6 +320,7 @@ export default function MatchBetting() {
         title: "Success",
         description: result.message,
       });
+      setResultData(result);
 
       // navigate(`/Wager/${id}/results`);
     } catch (error: any) {
@@ -501,7 +372,7 @@ export default function MatchBetting() {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      {/* Header */}
+      {/* Header section remains the same */}
       <div className="bg-gray-900 text-white sticky top-0 z-10 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Main Header Row */}
@@ -513,295 +384,104 @@ export default function MatchBetting() {
                   <ArrowLeft className="h-5 w-5 mr-2" />
                   <span className="text-sm sm:text-base">Back</span>
                 </Link>
-                <h1 className="text-sm font-bold">Match Predictions</h1>
+                <h1 className="text-lg font-bold">Match Predictions</h1>
               </div>
 
               {/* Right side with action buttons */}
-              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                {/* Refresh Button - Full width on mobile, auto on larger screens */}
-                {/* <button
-                  onClick={refreshScores}
-                  disabled={isRefreshing}
-                  className="flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-md text-sm font-medium transition-colors disabled:opacity-50 w-full sm:w-auto"
-                >
-                  {isRefreshing ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                  )}
-                  <span className="whitespace-nowrap">Refresh Scores</span>
-                </button> */}
-
-                {/* Complete Wager Button - Full width on mobile, auto on larger screens */}
-                <button
-                  onClick={completeStake}
-                  disabled={isCompleting}
-                  className="flex items-center justify-center px-4 py-2 bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-lg font-semibold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-50 w-full sm:w-auto"
-                >
-                  {isCompleting ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <Trophy className="h-4 w-4 mr-2" />
-                  )}
-                  <span className="whitespace-nowrap">Complete Wager</span>
-                </button>
-
-                {/* Predictions Button */}
-                {selections.length > 0 && (
-                  <button
-                    onClick={() => setShowPredictionsModal(true)}
-                    className="flex items-center justify-center px-4 py-2 hover:bg-blue-600 rounded-md transition-colors w-full sm:w-auto"
-                  >
-                    <BookText className="h-5 w-5 mr-2" />
-                    <span className="whitespace-nowrap">View Selections</span>
-                    <span className="ml-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                      {selections.length}
-                    </span>
-                  </button>
-                )}
-              </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Main Content */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Loading State */}
+        {/* Market Type Toggle */}
+        <div className="mb-4">
+          <div className="flex justify-center space-x-4">
+            <button
+              onClick={() => handleMarketTypeChange("outcome")}
+              className={`px-4 py-2 rounded-lg ${
+                marketType === "outcome" ? "bg-amber-500 text-white" : "bg-gray-800 text-gray-400"
+              }`}
+            >
+              Outcome
+            </button>
+            <button
+              onClick={() => handleMarketTypeChange("goals")}
+              className={`px-4 py-2 rounded-lg ${
+                marketType === "goals" ? "bg-amber-500 text-gray-900" : "bg-gray-800 text-gray-400"
+              }`}
+            >
+              Over/Under
+            </button>
+          </div>
+        </div>
+
+        {/* Main content */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <CustomLoader  />
+            <CustomLoader />
           </div>
         ) : error ? (
-          // Error State
           <div className="text-center text-red-500">Error: {error}</div>
         ) : isStakeCompleted ? (
-          <div className="flex flex-col items-center justify-center h-[calc(100vh-76px)]">
-            <CheckCircle2 className="h-16 w-16 text-green-500 mb-4" />
-            <h2 className="text-2xl font-semibold text-white mb-2">Wager Completed</h2>
-            <p className="text-gray-500 text-center max-w-md mb-6">
-              This Wager has been completed and the results have been finalized.
-            </p>
-            <Link
-              to="/super-picks"
-              className="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 hover:bg-gray-700 transition-colors hover:text-white"
-            >
-              Return to Wager Listings
-            </Link>
-          </div>
+          <MatchResults data={resultData} />
         ) : matches.length === 0 ? (
-          // No Matches State
           <div className="text-center text-gray-500">No matches found for today.</div>
         ) : (
-          // Matches List
-          <div className="space-y-4">
-            {matches.map((match) => {
-              const { prediction: existingSelection, result } = getExistingSelection(match);
-              const renderMatchState = () => {
-                if (match.cancelled) {
-                  return <div className="text-red-500 text-sm font-medium">Match Cancelled</div>;
-                }
+          <div className="space-y-8">
+            {matches.map((match) => (
+              <MatchCard
+                key={match.id}
+                match={match}
+                marketType={marketType}
+                existingSelection={getExistingSelection(match)}
+                currentSelections={selections}
+                onSelect={toggleSelection}
+                result={checkPredictionResult(
+                  match,
+                  existingSelections.find((sel) => sel.match_id === match.matchId)?.prediction,
+                )}
+              />
+            ))}
 
-                if (match.started && !match.finished) {
-                  return (
-                    <span className="flex items-center text-red-500 text-sm">
-                      <div className="w-2 h-2 bg-red-500 rounded-full mr-1 animate-pulse" />
-                      LIVE
-                      {match.homeScore !== undefined && match.awayScore !== undefined && (
-                        <span className="ml-2 font-bold">
-                          {match.homeScore} - {match.awayScore}
-                        </span>
-                      )}
-                    </span>
-                  );
-                }
-
-                if (match.finished) {
-                  return (
-                    <div className="text-green-600 text-sm font-medium">
-                      Final Score: {match.homeScore} - {match.awayScore}
-                    </div>
-                  );
-                }
-
-                // Not started and not cancelled
-                return (
-                  <div className="flex items-center text-gray-500 text-sm">
-                    <Timer className="h-4 w-4 mr-1" />
-                    {match.matchTime}
-                  </div>
-                );
-              };
-              return (
-                <div key={match.id} className="bg-gray-800 rounded-lg shadow-sm p-4">
-                  {/* League & Time */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <Flag ccode={match.ccode} size="sm" className="rounded-sm" />
-                      <span className="text-sm font-medium text-gray-400">{match.league}</span>
-                    </div>
-                    {renderMatchState()}
-                  </div>
-
-                  {/* Teams & Predictions */}
-                  <div className="grid grid-cols-3 gap-2">
-                    {/* Home Win */}
-                    <button
-                      onClick={() =>
-                        !existingSelection && toggleSelection(match.matchId, "home", match.homeTeam, match.awayTeam)
-                      }
-                      disabled={match.started || match.finished || match.cancelled || !!existingSelection}
-                      className={`p-3 rounded-lg border transition-colors ${
-                        match.started || match.finished || match.cancelled
-                          ? "opacity-50 cursor-not-allowed"
-                          : selections.find((s) => s.matchId === match.matchId && s.prediction === "home")
-                            ? "bg-gray-900 border-cyan-400 text-white"
-                            : existingSelection === "home"
-                              ? "bg-blue-50 border-blue-500 text-blue-700"
-                              : existingSelection
-                                ? "opacity-50 cursor-not-allowed"
-                                : "hover:bg-gray-90 text-white border border-gray-500"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <img src={match.homeLogo} alt={match.homeTeam} className="h-6 w-6" />
-                        {existingSelection === "home" && (
-                          <div className="">
-                            {result === "correct" ? (
-                              <Check className="h-4 w-4 text-green-500" />
-                            ) : result === "incorrect" ? (
-                              <X className="h-4 w-4 text-red-500" />
-                            ) : null}
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-sm font-medium text-left">{match.homeTeam}</div>
-                    </button>
-
-                    {/* Draw */}
-                    <button
-                      onClick={() =>
-                        !existingSelection && toggleSelection(match.matchId, "draw", match.homeTeam, match.awayTeam)
-                      }
-                      disabled={match.started || match.finished || match.cancelled || !!existingSelection}
-                      className={`p-3 rounded-lg border transition-colors ${
-                        match.started || match.finished || match.cancelled
-                          ? "opacity-50 cursor-not-allowed"
-                          : selections.find((s) => s.matchId === match.matchId && s.prediction === "draw")
-                            ? "bg-gray-900 border-cyan-400 text-white"
-                            : existingSelection === "draw"
-                              ? "bg-blue-50 border-blue-500 text-blue-700"
-                              : existingSelection
-                                ? "opacity-50 cursor-not-allowed"
-                                : "text-white border border-gray-500"
-                      }`}
-                    >
-                      <div className="text-center mb-2">
-                        <span className="font-bold">X</span>
-                        {existingSelection === "draw" && (
-                          <div className="flex justify-left text-center">
-                            {result === "correct" ? (
-                              <Check className="h-4 w-4 text-green-500" />
-                            ) : result === "incorrect" ? (
-                              <X className="h-4 w-4 text-red-500" />
-                            ) : null}
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-sm font-medium text-center">Draw</div>
-                    </button>
-
-                    {/* Away Win */}
-                    <button
-                      onClick={() =>
-                        !existingSelection && toggleSelection(match.matchId, "away", match.homeTeam, match.awayTeam)
-                      }
-                      disabled={match.started || match.finished || match.cancelled || !!existingSelection}
-                      className={`p-3 rounded-lg border transition-colors ${
-                        match.started || match.finished || match.cancelled
-                          ? "opacity-50 cursor-not-allowed"
-                          : selections.find((s) => s.matchId === match.matchId && s.prediction === "away")
-                            ? "bg-gray-900 border-cyan-400 text-white"
-                            : existingSelection === "away"
-                              ? "bg-blue-50 border-blue-500 text-blue-700"
-                              : existingSelection
-                                ? "opacity-50 cursor-not-allowed"
-                                : "text-white border border-gray-500"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <img src={match.awayLogo} alt={match.awayTeam} className="h-6 w-6" />
-                        {existingSelection === "away" && (
-                          <div className="">
-                            {result === "correct" ? (
-                              <Check className="h-4 w-4 text-green-500" />
-                            ) : result === "incorrect" ? (
-                              <X className="h-4 w-4 text-red-500" />
-                            ) : null}
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-sm font-medium text-right">{match.awayTeam}</div>
-                    </button>
-                  </div>
-
-                  {/* Existing Selection Notice */}
-                  {/* {existingSelection && (
-                    <div className="text-center text-green-600 text-sm mt-2 font-medium">
-                      You've already predicted this match
-                    </div>
-                  )} */}
-                </div>
-              );
-            })}
+            <div className="flex flex-wrap items-center justify-end gap-2 w-full mt-10">
+              <button
+                onClick={completeStake}
+                disabled={isCompleting}
+                className="flex items-center justify-center px-4 py-2 bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-lg font-semibold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-50 w-full sm:w-auto"
+              >
+                {isCompleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Trophy className="h-4 w-4 mr-2" />}
+                <span className="whitespace-nowrap">Complete</span>
+              </button>
+            </div>
           </div>
         )}
 
-        {/* Predictions Modal */}
-        <Dialog open={showPredictionsModal} onOpenChange={setShowPredictionsModal}>
-          <DialogContent className="w-[90%] sm:max-w-md rounded-lg bg-gray-900 border-0">
-            <DialogHeader>
-              <DialogTitle className="text-gray-400">Your Predictions</DialogTitle>
-              <DialogDescription>Review your match predictions before proceeding.</DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              <div className="divide-y">
-                {selections.map((selection, index) => (
-                  <div key={index} className="py-3">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium text-gray-400">
-                        {selection.homeTeam} vs {selection.awayTeam}
-                      </span>
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {getResultText(selection.prediction, selection.homeTeam, selection.awayTeam)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="border-t pt-4">
-                <button
-                  onClick={saveSelections}
-                  disabled={isSaving}
-                  className={`w-full text-dark py-3 rounded-lg font-medium transition-colors flex items-center justify-center ${
-                    isSaving ? "bg-cyan-200 cursor-not-allowed" : "bg-cyan-400 "
-                  }`}
-                >
-                  {isSaving ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving Predictions...
-                    </>
-                  ) : (
-                    "Proceed to Bet"
-                  )}
-                </button>
-              </div>
+        {/* Selected Matches Counter */}
+        {selections.length > 0 && (
+          <div className="fixed bottom-4 left-0 right-0 mx-4 z-50">
+            <div className="bg-gradient-to-r from-amber-500 to-pink-500 text-white p-4 rounded-lg shadow-lg flex justify-between items-center">
+              <span className="font-semibold">
+                {selections.length} {selections.length === 1 ? "Prediction" : "Predictions"} Made
+              </span>
+              <Button
+                onClick={() => setShowPredictionsModal(true)}
+                className="bg-white text-amber-500 hover:bg-gray-100"
+              >
+                View
+              </Button>
             </div>
-          </DialogContent>
-        </Dialog>
+          </div>
+        )}
+
+        {/* Predictions Modal remains mostly the same, just update to handle new market type */}
+        <SelectionDialog
+          open={showPredictionsModal}
+          onOpenChange={setShowPredictionsModal}
+          selections={selections}
+          marketType={marketType}
+          isSaving={isSaving}
+          onSave={saveSelections}
+        />
       </div>
     </div>
   );

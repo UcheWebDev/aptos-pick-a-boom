@@ -216,6 +216,7 @@ interface LeagueFlagProps {
 }
 
 const Flag: React.FC<LeagueFlagProps> = ({ size = "md", className = "", ccode }) => {
+  
   const normalizedCode : string= fifaToIso[ccode] || "";
   const countryCode = normalizedCode.toLowerCase();
   console.log(countryCode);

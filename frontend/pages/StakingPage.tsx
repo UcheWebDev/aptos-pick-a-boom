@@ -60,7 +60,7 @@ const CustomLoader = () => (
     ></div>
 
     {/* Container with P */}
-    <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-gray-800 rounded-lg">
+    <div className="flex items-center justify-center w-10 h-10 from-gray-800 rounded-lg">
       <span className="text-2xl font-bold text-amber-500">P</span>
     </div>
   </div>
@@ -89,6 +89,8 @@ export default function BettingForm() {
 
   const [txHash, settxHash] = useState("");
   const [selectedCutPreset, setSelectedCutPreset] = useState<number | null>(0);
+  const [selectedMarketType, setSelectedMarketType] = useState("outcome");
+
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [errors, setErrors] = useState<{ amount?: string; totalGames?: string; time?: string }>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -224,32 +226,32 @@ export default function BettingForm() {
       setisLoading(true);
       setIsProcessingTransaction(true); // Set processing state to true
 
-      // const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-states`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     selected_matches: selectedMatches.map((s) => s.matchId),
-      //   }),
-      // });
+      const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-states`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          selected_matches: selectedMatches.map((s) => s.matchId),
+        }),
+      });
 
-      // if (!response.ok) {
-      //   throw new Error("Failed to verify match states");
-      // }
+      if (!response.ok) {
+        throw new Error("Failed to verify match states");
+      }
 
-      // const stateCheck = await response.json();
+      const stateCheck = await response.json();
 
-      // if (!stateCheck.valid) {
-      //   toast({
-      //     title: "Cannot Save Predictions",
-      //     description: `${stateCheck.invalidCount} match${stateCheck.invalidCount > 1 ? "es have" : " has"} already started or finished. Please refresh and try again.`,
-      //     variant: "destructive",
-      //   });
-      //   setisLoading(false);
-      //   setIsProcessingTransaction(false);
-      //   return;
-      // }
+      if (!stateCheck.valid) {
+        toast({
+          title: "Cannot Save Wager",
+          description: `${stateCheck.invalidCount} match${stateCheck.invalidCount > 1 ? "es have" : " has"} already started or finished. Please refresh and try again.`,
+          variant: "destructive",
+        });
+        setisLoading(false);
+        setIsProcessingTransaction(false);
+        return;
+      }
 
       const pairId = await generateUniquePairId();
       const amountInOctas = Math.floor(parseFloat(amount) * 100000000);
@@ -268,6 +270,7 @@ export default function BettingForm() {
         total_cut: selectedCutPreset,
         total_picks: parseInt(totalGames),
         pair_id: pairId,
+        market_type: selectedMarketType,
         selected_matches: selectedMatches.map((match) => match.matchId), // Add selected matches
       });
       if (stakeError) {
@@ -283,9 +286,11 @@ export default function BettingForm() {
       settxHash(executedTransaction.hash);
       setisLoading(false);
       setIsConfirmDialogOpen(false);
+      setIsBettingFormOpen(false);
       setIsSuccessDialogOpen(true);
       setAmount("");
       setTotalGames("");
+      setSelectedMatches([]),
       setMultiplier(1.5);
       setSelectedCutPreset(0);
     } catch (error) {
@@ -306,10 +311,6 @@ export default function BettingForm() {
     return `${numValue.toFixed(6)} APT`;
   };
 
-  const handleCutPresetToggle = (index: number) => {
-    setSelectedCutPreset(index);
-  };
-
   const truncateHash = (hash) => {
     if (!hash) return "";
     if (hash.length <= 20) return hash;
@@ -328,49 +329,6 @@ export default function BettingForm() {
       matchDate.getFullYear() === currentDate.getFullYear()
     );
   };
-
-  const fetchTotalCount = async () => {
-    try {
-      // Reset state
-      setMatchesLoading(true);
-      setFetchMatchesError(null);
-      const currentDateTime = new Date();
-
-      // Fetch matches
-      const { data: matchesData, error: matchesError } = await supabase
-        .from("matches")
-        .select("*", { count: "exact" }) // Use exact count
-        .in("ccode", ["FRA", "ESP", "ENG", "GER", "ITA", "TUR"]);
-
-      if (matchesError) throw matchesError;
-
-      // Filter matches based on current date
-      const filteredMatchCount = matchesData.filter((match) =>
-        isMatchCurrentDate(match.matchTime, currentDateTime),
-      ).length;
-
-      const filteredTodayMatch = matchesData.filter((match) => match);
-
-      const filteredNotStartedMatch = filteredTodayMatch.filter(
-        (match) => match.started == false && match.finished == false && match.cancelled == false,
-      );
-      const matchCnt = filteredTodayMatch.filter(
-        (match) => match.started == false && match.finished == false && match.cancelled == false,
-      ).length;
-      // Set the item count
-      setTodaysMatches(filteredNotStartedMatch);
-      setMatchesCount(matchCnt);
-      setMatchesLoading(false);
-    } catch (err) {
-      console.error("Error fetching match count:", err);
-      setFetchMatchesError(err.message);
-      setMatchesLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTotalCount();
-  }, []);
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -398,7 +356,6 @@ export default function BettingForm() {
   const toggleMatchSelection = (match) => {
     if (selectedMatches.find((m) => m.matchId === match.matchId)) {
       setSelectedMatches((prev) => prev.filter((m) => m.matchId !== match.matchId));
-
     } else {
       if (selectedMatches.length < 10) {
         setSelectedMatches((prev) => [...prev, match]);
@@ -637,47 +594,6 @@ export default function BettingForm() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Matches Dialog */}
-      <Dialog open={isMatchesDialogOpen} onOpenChange={setIsMatchesDialogOpen}>
-        <DialogContent className="w-[95%] bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl border border-gray-700 ">
-          <DialogHeader>
-            <DialogTitle>{/* Title content */}</DialogTitle>
-          </DialogHeader>
-
-          <div className="py-2 sm:py-4 overflow-y-auto">
-            <FixturesSelection
-              matches={todaysMatches}
-              maxAllowedSelections={10}
-              alreadySelectedMatches={selectedMatches}
-              currentSelection={currentSelectedMatches}
-              onSelectionChange={(matches) => {
-                setCurrentSelectedMatches(matches);
-              }}
-            />
-          </div>
-
-          <DialogFooter className="flex flex-row space-x-2">
-            <Button
-              variant="outline"
-              className="w-full sm:w-1/2  px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 hover:bg-gray-700 transition-colors hover:text-white"
-              onClick={() => setIsMatchesDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                setSelectedMatches(currentSelectedMatches);
-                setTotalGames(currentSelectedMatches.length.toString());
-                setIsMatchesDialogOpen(false);
-              }}
-              className="w-full sm:w-1/2 bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group"
-            >
-              Confirm
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       {/* Betting Form Dialog */}
       <Dialog open={isBettingFormOpen} onOpenChange={setIsBettingFormOpen}>
         <DialogContent className="w-[95%] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-lg">
@@ -779,28 +695,34 @@ export default function BettingForm() {
               )}
             </div>
 
-            {/* Multiplier Section */}
+            {/* Market Type Selection */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
-                <label className="text-sm font-medium text-gray-400">Flex (coming soon)</label>
+                <label className="text-sm font-medium text-gray-400">Market Type</label>
               </div>
 
-              {/* Cut Presets */}
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                {cutPresets.map((preset, index) => (
-                  <button
-                    key={preset.label}
-                    onClick={() => handleCutPresetToggle(preset.multiplier)}
-                    disabled={true}
-                    className={`px-4 py-2 rounded-lg  text-sm font-medium transition-colors ${
-                      selectedCutPreset === preset.multiplier
-                        ? "bg-blue-600 text-white"
-                        : " bg-gray-800/50 text-gray-400 border border-gray-700 rounded hover:bg-gray-700"
-                    }`}
-                  >
-                    {preset.label}
-                  </button>
-                ))}
+              {/* Market Type Options */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <button
+                  onClick={() => setSelectedMarketType(selectedMarketType === "outcome" ? null : "outcome")}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    selectedMarketType === "outcome"
+                      ? "bg-gradient-to-r from-amber-500 to-pink-500 text-white"
+                      : "bg-gray-800/50 text-gray-400 border border-gray-700 hover:bg-gray-700"
+                  }`}
+                >
+                  Outcome
+                </button>
+                <button
+                  onClick={() => setSelectedMarketType(selectedMarketType === "ou" ? null : "ou")}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    selectedMarketType === "ou"
+                      ? "bg-gradient-to-r from-amber-500 to-pink-500 text-white"
+                      : "bg-gray-800/50 text-gray-400 border border-gray-700 hover:bg-gray-700"
+                  }`}
+                >
+                  Over/Under
+                </button>
               </div>
             </div>
 

@@ -17,6 +17,8 @@ import {
   Wallet,
   Clock,
   ChevronRight,
+  Timer,
+  MapPin,
   Crown,
   Dices,
   MousePointerClick,
@@ -32,6 +34,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
 
 import { pairFunc } from "@/entry-functions/pairFunc";
 import { unStakeFunc } from "@/entry-functions/unStakeFunc";
@@ -120,6 +124,8 @@ export function StakeCard({ stake, authorizedUser }) {
   const winningAmount = parseFloat(stake.amount) * 2;
 
   const handleSubmit = () => {
+    console.log("hel");
+
     setIsPairDialogOpen(true);
   };
 
@@ -144,32 +150,32 @@ export function StakeCard({ stake, authorizedUser }) {
         throw new Error("No matches selected for this Wager");
       }
 
-      // const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-states`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     selected_matches: stakeDt.selected_matches,
-      //   }),
-      // });
+      const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-states`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          selected_matches: stakeDt.selected_matches,
+        }),
+      });
 
-      // if (!response.ok) {
-      //   const errorData = await response.json();
-      //   throw new Error(errorData.details || "Failed to check match states");
-      // }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.details || "Failed to check match states");
+      }
 
-      // const matchStateCheck = await response.json();
+      const matchStateCheck = await response.json();
 
-      // if (!matchStateCheck.valid) {
-      //   toast({
-      //     title: "Cannot Pair Wager",
-      //     description: matchStateCheck.message,
-      //     variant: "destructive",
-      //   });
-      //   setisLoading(false);
-      //   return;
-      // }
+      if (!matchStateCheck.valid) {
+        toast({
+          title: "Cannot Pair Wager",
+          description: matchStateCheck.message,
+          variant: "destructive",
+        });
+        setisLoading(false);
+        return;
+      }
 
       const amountInOctas = Math.floor(parseFloat(stake.amount) * 100000000);
       const committedTransaction = await signAndSubmitTransaction(pairFunc(amountInOctas, stake.creator, stake.id));
@@ -555,9 +561,9 @@ export function StakeCard({ stake, authorizedUser }) {
               </button>
 
               <button className="relative w-full group" onClick={() => onUnstakeStake()}>
-              <div className="w-full bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group">
-                  <Ban className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  <span className=" transition-colors"> Unstake</span>
+                <div className="relative bg-gray-800 text-white rounded-lg border border-amber-500 text-white py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2">
+                  <Ban className="w-4 h-4 group-hover:translate-x-1 transition-transform text-amber-400" />
+                  <span className="text-amber-400 transition-colors"> Unstake</span>
                 </div>
               </button>
             </>
@@ -601,10 +607,10 @@ export function StakeCard({ stake, authorizedUser }) {
       <Dialog open={isPairDialogOpen} onOpenChange={setIsPairDialogOpen}>
         <DialogContent className="w-[90%] max-w-md mx-auto bg-gray-900 border border-gray-700 rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-gray-400">Confirm Your Wager Pair</DialogTitle>
+            <DialogTitle className="text-center text-lg text-amber-500">Confirm Your Wager Pair</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="border-b pb-4">
+            <div className="border-b pb-4 mt-4">
               <div className="flex justify-between mb-2">
                 <span className="text-gray-400">Wager Amount:</span>
                 <span className="font-semibold text-white">{stake.amount} APT</span>
@@ -639,7 +645,7 @@ export function StakeCard({ stake, authorizedUser }) {
 
       {/* Success Dialog */}
       <Dialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
-        <DialogContent className="w-[90%] max-w-md mx-auto border-0 text-center bg-gray-900 rounded-lg">
+        <DialogContent className="w-[90%] max-w-md mx-auto border border-gray-700 text-center bg-gray-900 rounded-lg">
           <div className="flex justify-center mb-4">
             <div className="bg-green- p-3 rounded-full">
               <CheckCircle className="h-12 w-12 text-green-500" />
@@ -648,216 +654,244 @@ export function StakeCard({ stake, authorizedUser }) {
           <DialogTitle className="text-gray-400">Pairing Complete!</DialogTitle>
           <DialogDescription>Transaction hash: {txHash ? truncateHash(txHash) : ""}</DialogDescription>
           <DialogFooter className="sm:justify-center">
-            <Button onClick={() => navigateToMatchesPage()} className="w-full sm:w-auto bg-cyan-400 text-dark">
+            <Button onClick={() => navigateToMatchesPage()} className="bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-lg font-semibold hover:from-amber-600 hover:to-pink-600 transition-all duration-300">
               Done
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Details Dialog */}
       <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] w-[90%] rounded-lg bg-gray-900  border border-gray-700 overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              <span className="text-gray-100 uppercase">Wager Informations</span>
-              {/* <span
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  stake.status === "Open" || stake.status === "Completed"
-                    ? "bg-green-50 text-green-700 border border-green-200"
-                    : "bg-blue-100 text-blue-700 border border-blue-300"
-                }`}
-              >
-                {stake.status}
-              </span> */}
-            </DialogTitle>
+        <DialogContent className="w-[95%] max-h-[90vh] overflow-y-auto bg-gray-900 rounded-md border-0">
+          <DialogHeader className="p-4 sm:p-6 border-b border-gray-700">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
+              <DialogTitle className="text-gray-100 uppercase font-semibold">Wager Information</DialogTitle>
+              <div className="flex space-x-2 sm:space-x-4 w-full sm:w-auto">
+                <button
+                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-full transition-colors ${
+                    activeTab === "details" ? "bg-amber-500 text-white" : "text-gray-400 hover:text-white"
+                  }`}
+                  onClick={() => setActiveTab("details")}
+                >
+                  Details
+                </button>
+                <button
+                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-full transition-colors ${
+                    activeTab === "matches" ? "bg-amber-500 text-white" : "text-gray-400 hover:text-white"
+                  }`}
+                  onClick={() => setActiveTab("matches")}
+                >
+                  Matches
+                </button>
+              </div>
+            </div>
           </DialogHeader>
 
-          <div className="flex space-x-2 border-b border-gray-700 pb-4">
-            <TabButton tab="details" label="Details" />
-            {stake.status !== "Completed" && <TabButton tab="matches" label="Selected Matches" />}
-          </div>
-
-          {/* Existing tab content remains the same */}
-          {/* Tab Content */}
-          {activeTab === "details" ? (
-            // Details Tab Content
-            isLoadingDetails ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="flex flex-col items-center space-y-3">
-                  <SpinButton />
-                  <p className="text-sm text-gray-500">Loading Wager Details...</p>
-                </div>
-              </div>
-            ) : stakeDetails ? (
-              <div className="space-y-6">
-                {/* Main Info Section */}
-                <div className="bg-gray-800 p-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-400">Created By</p>
-                      <p className="font-medium text-white">{formatAddress(stake.creator)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-400">Amount</p>
-                      <p className="font-medium text-white">{stake.amount} APT</p>
-                    </div>
+          <div className="p-4 sm:p-6">
+            {activeTab === "details" ? (
+              isLoadingDetails ? (
+                <div className="space-y-6">
+                  {/* Loading states */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-gray-800 p-4 rounded-lg animate-pulse h-24" />
+                    <div className="bg-gray-800 p-4 rounded-lg animate-pulse h-24" />
                   </div>
-                </div>
-
-                {/* Stats Grid */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-800 p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-gray-400">Total Cut</p>
-                        <p className="text-lg font-semibold text-white">{stakeDetails.total_cut}</p>
-                      </div>
-                      <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
-                        <div className="bg-gray-900 p-2 rounded-lg">
-                          <Coins className="w-5 h-5 text-amber-500" />
-                        </div>
-                      </div>
-                      {/* <div className="bg-gray-900 p-2 rounded-full">
-                        <Coins className="w-5 h-5 text-cyan-400" />
-                      </div> */}
-                    </div>
-                  </div>
-                  <div className="bg-gray-800 p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-gray-400">Total Picks</p>
-                        <p className="text-lg font-semibold text-white">{stakeDetails.total_picks}</p>
-                      </div>
-                      {/* <div className="bg-gray-900 p-2 rounded-full">
-                        <Users className="w-5 h-5 text-cyan-400" />
-                      </div> */}
-                      <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
-                        <div className="bg-gray-900 p-2 rounded-lg">
-                          <Users className="w-5 h-5 text-amber-500" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Timeline Section */}
-                <div className="border-t border-gray-700 pt-4">
-                  <h3 className="text-sm font-medium text-gray-400 mb-3">Timeline</h3>
                   <div className="space-y-4">
-                    <div className="flex items-start space-x-3">
-                      <div className="bg-gray-900 p-1 rounded-full">
-                        <CheckCircle className="w-4 h-4 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-300">Wager Created</p>
-                        {/* <p className="text-sm text-gray-500">{formatDate(stakeDetails.created_at)}</p> */}
-                      </div>
+                    <div className="h-4 bg-gray-800 rounded animate-pulse w-24" />
+                    <div className="space-y-4">
+                      <div className="h-12 bg-gray-800 rounded animate-pulse" />
+                      <div className="h-12 bg-gray-800 rounded animate-pulse" />
+                      <div className="h-12 bg-gray-800 rounded animate-pulse" />
                     </div>
-
-                    {stakeDetails.pairer_addr && (
-                      <div className="flex items-start space-x-3">
-                        <div className="bg-gray-900 p-1 rounded-full">
-                          <Users className="w-4 h-4 text-amber-400" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-300">
-                            Paired by {formatAddress(stakeDetails.pairer_addr)}
-                          </p>
-                          <p className="text-sm text-gray-500">Wager was paired</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {stakeDetails.winner_addr && (
-                      <div className="flex items-start space-x-3">
-                        <div className="bg-gray-900 p-1 rounded-full">
-                          <BookCheck className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-400">Wager completed</p>
-                          <p className="text-sm text-gray-400">Winner is {formatAddress(stakeDetails.winner_addr)}</p>
-                        </div>
-                      </div>
-                    )}
                   </div>
+                  <div className="bg-gray-800 p-4 rounded-lg animate-pulse h-16" />
                 </div>
-
-                {/* Additional Details */}
-                <div className="bg-gray-800 rounded-lg p-4 space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-400">Pair ID</span>
-                    <div className="flex items-center gap-2">
-                      <code className="bg-gray-100 px-2 py-1 rounded text-sm">{stake.pair_id}</code>
-                      <button
-                        onClick={copyToClipboard}
-                        className="p-1 hover:bg-gray-200 rounded-full transition-colors"
-                        aria-label="Copy pair ID"
-                      >
-                        {copied ? (
-                          <Check className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Copy className="h-4 w-4 text-gray-500" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-600">Failed to load Wager Details</p>
-              </div>
-            )
-          ) : (
-            // Matches Tab Content
-            <div className="space-y-4">
-              {isLoadingMatches ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="flex flex-col items-center space-y-3">
-                    <SpinButton />
-                    <p className="text-sm text-gray-500">Loading selected matches...</p>
-                  </div>
-                </div>
-              ) : selectedMatches?.length > 0 ? (
-                selectedMatches.map((match) => (
-                  <div key={match.matchId} className="bg-gray-800 p-4 transition-colors">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <Trophy className="w-5 h-5 text-cyan-400" />
-                        <span className="font-medium text-gray-400">Match #{match.matchId}</span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 mt-3">
-                      <div>
-                        <p className="text-sm text-gray-500">Teams</p>
-                        <p className="text-sm font-medium text-gray-400">
-                          {match.homeTeam} vs {match.awayTeam}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Date</p>
-                        <p className="text-sm font-medium text-gray-400">{match.matchTime}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))
               ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">No matches selected for this Wager</p>
+                <div className="space-y-6">
+                  {/* Main Info */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-gray-800 p-4 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-gray-400">Wager Amount</p>
+                          <p className="text-lg font-semibold text-white">
+                            {formatStakeAmount(stakeDetails?.stake_amount)} APT
+                          </p>
+                        </div>
+                        <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
+                          <div className="bg-gray-900 p-2 rounded-lg">
+                            <Coins className="w-5 h-5 text-amber-500" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-gray-800 p-4 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-gray-400">Total Picks</p>
+                          <p className="text-lg font-semibold text-white">{stakeDetails?.total_picks}</p>
+                        </div>
+                        <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
+                          <div className="bg-gray-900 p-2 rounded-lg">
+                            <Users className="w-5 h-5 text-amber-500" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Timeline */}
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-medium text-gray-400">Timeline</h3>
+                    <div className="space-y-4">
+                      <div className="flex items-start space-x-3">
+                        <div className="bg-gray-800 p-1.5 rounded-full">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-300">Wager Created</p>
+                          <p className="text-sm text-gray-500">by {formatAddress(stake.creator)}</p>
+                        </div>
+                      </div>
+
+                      {stakeDetails?.pairer_addr && (
+                        <div className="flex items-start space-x-3">
+                          <div className="bg-gray-800 p-1.5 rounded-full">
+                            <Users className="w-4 h-4 text-amber-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-300">
+                              Paired by {formatAddress(stakeDetails?.pairer_addr)}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {stakeDetails?.winner_addr && (
+                        <div className="flex items-start space-x-3">
+                          <div className="bg-gray-800 p-1.5 rounded-full">
+                            <BookCheck className="w-4 h-4 text-green-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-300">
+                              Winner: {formatAddress(stakeDetails?.winner_addr)}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Pair ID */}
+                  <div className="bg-gray-800 p-4 rounded-lg">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
+                      <span className="text-sm text-gray-400">Pair ID</span>
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <code className="bg-gray-700 px-2 py-1 rounded text-sm text-gray-200 flex-1 sm:flex-none overflow-x-auto">
+                          {stake.pair_id}
+                        </code>
+                        <button
+                          onClick={copyToClipboard}
+                          className="p-1.5 hover:bg-gray-700 rounded-lg transition-colors shrink-0"
+                        >
+                          {copied ? (
+                            <Check className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <Copy className="h-4 w-4 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
-          )}
+              )
+            ) : (
+              <div className="space-y-4">
+                {isLoadingMatches
+                  ? // Loading state for matches
+                    Array.from({ length: 3 }).map((_, index) => (
+                      <div key={index} className="bg-gray-800 rounded-lg overflow-hidden">
+                        {/* Loading League Header */}
+                        <div className="bg-gray-700 px-4 py-2 flex items-center justify-between">
+                          <div className="w-32 h-4 bg-gray-800 rounded animate-pulse" />
+                          <div className="w-24 h-4 bg-gray-800 rounded animate-pulse" />
+                        </div>
+
+                        {/* Loading Match Details */}
+                        <div className="p-4">
+                          {/* Loading Teams and Score */}
+                          <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 mb-4">
+                            <div className="w-32 h-6 bg-gray-700 rounded animate-pulse" />
+                            <div className="w-8 h-6 bg-gray-700 rounded animate-pulse" />
+                            <div className="w-32 h-6 bg-gray-700 rounded animate-pulse" />
+                          </div>
+
+                          {/* Loading Match Info */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                            <div className="w-40 h-4 bg-gray-700 rounded animate-pulse" />
+                          </div>
+
+                          {/* Loading Prediction */}
+                          <div className="mt-4 flex justify-end">
+                            <div className="w-20 h-6 bg-gray-700 rounded-full animate-pulse" />
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  : selectedMatches?.map((match) => (
+                      <div key={match.matchId} className="bg-gray-800 rounded-lg overflow-hidden">
+                        {/* League Header */}
+                        <div className="bg-gray-700 px-4 py-2 flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Trophy className="w-4 h-4 text-amber-500" />
+                            <span className="text-sm font-medium text-gray-300">{match.league}</span>
+                          </div>
+                          <span className="text-sm text-gray-400">Match #{match.matchId}</span>
+                        </div>
+
+                        {/* Match Details */}
+                        <div className="p-4">
+                          {/* Teams and Score */}
+                          <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 mb-4">
+                            <div className="text-center sm:flex-1">
+                              <p className="text-white font-semibold">{match.homeTeam}</p>
+                            </div>
+                            <div className="px-4">
+                              <span className="text-amber-500 font-bold text-lg">vs</span>
+                            </div>
+                            <div className="text-center sm:flex-1">
+                              <p className="text-white font-semibold">{match.awayTeam}</p>
+                            </div>
+                          </div>
+
+                          {/* Match Info */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm">
+                            <div className="flex items-center space-x-2">
+                              <Timer className="w-4 h-4 text-gray-400 shrink-0" />
+                              <span className="text-gray-300">{match.matchTime}</span>
+                            </div>
+                          </div>
+
+                          {/* Prediction */}
+                          {/* <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+                            <div className="bg-gray-700 px-3 py-1 rounded-full">
+                              <span className="text-amber-500 font-semibold">@ {match.matchTime}</span>
+                            </div>
+                          </div> */}
+                        </div>
+                      </div>
+                    ))}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
       {/* Unstake Dialog */}
       <Dialog open={isUnstakeDialogOpen} onOpenChange={setIsUnstakeDialogOpen}>
-        <DialogContent className="w-[90%] max-w-md mx-auto rounded-lg border-0 bg-gray-900">
-          <DialogHeader>
-            <DialogTitle className="text-gray-400">Remove Wager</DialogTitle>
+        <DialogContent className="w-[90%] max-w-md mx-auto rounded-lg border border-gray-700 bg-gray-900">
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-center text-lg text-amber-500">Remove Wager</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="border-b border-gray-700 pb-4">
