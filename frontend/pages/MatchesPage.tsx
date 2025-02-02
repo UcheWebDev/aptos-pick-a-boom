@@ -406,6 +406,7 @@ export default function MatchBetting() {
             </button>
             <button
               onClick={() => handleMarketTypeChange("goals")}
+              disabled={true}
               className={`px-4 py-2 rounded-lg ${
                 marketType === "goals" ? "bg-amber-500 text-gray-900" : "bg-gray-800 text-gray-400"
               }`}

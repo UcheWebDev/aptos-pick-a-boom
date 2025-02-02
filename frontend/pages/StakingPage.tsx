@@ -290,8 +290,7 @@ export default function BettingForm() {
       setIsSuccessDialogOpen(true);
       setAmount("");
       setTotalGames("");
-      setSelectedMatches([]),
-      setMultiplier(1.5);
+      setSelectedMatches([]), setMultiplier(1.5);
       setSelectedCutPreset(0);
     } catch (error) {
       console.error(error);
@@ -715,6 +714,7 @@ export default function BettingForm() {
                 </button>
                 <button
                   onClick={() => setSelectedMarketType(selectedMarketType === "ou" ? null : "ou")}
+                  disabled={true}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     selectedMarketType === "ou"
                       ? "bg-gradient-to-r from-amber-500 to-pink-500 text-white"
