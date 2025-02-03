@@ -8,6 +8,7 @@ import WalletPage from "./pages/Wallet";
 import HowTo from "./pages/HowTo";
 import StakingPage from "./pages/StakingPage";
 import MatchesPage from "./pages/MatchesPage";
+import StakeResultsPage from "./pages/StakeResultsPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import IndexPage from "./pages/IndexPage";
 
@@ -29,6 +30,8 @@ const router = createBrowserRouter(
       <Route path="/how-to-play" element={<HowTo />} />
       <Route path="/wager" element={<Layout><StakingPage /></Layout>} />
       <Route path="/matches-page/:id" element={<MatchesPage />} />
+      <Route path="/stake-results/:id" element={<StakeResultsPage />} />
+
     </>,
   ),
 );

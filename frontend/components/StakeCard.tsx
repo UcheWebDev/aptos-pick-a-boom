@@ -301,7 +301,7 @@ export function StakeCard({ stake, authorizedUser }) {
         title: "Success",
         description: result.message + ` Transaction hash: ${executedTransaction.hash}`,
       });
-      
+      navigate(`/stake-results/${stake.id}`);
     } catch (error) {
       console.error("Error completing Wager:", error);
       toast({

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useQuery } from "@tanstack/react-query";
-import { Globe, Unlock, UserRound, ListStart, X } from "lucide-react";
+import { Globe, Unlock, UserRound, ListStart, X, AlignJustify } from "lucide-react";
 import { useParams } from "react-router-dom";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -114,7 +114,10 @@ export default function PlayPredictor() {
       {isFilterOpen && (
         <div className="fixed inset-y-0 right-0 w-80 bg-gray-900 z-50 border-l border-gray-600 overflow-y-auto">
           <div className="p-4">
-            <button onClick={() => setIsFilterOpen(false)} className="p-2 bg-gray-800 hover:bg-gray-800 rounded-lg mb-4">
+            <button
+              onClick={() => setIsFilterOpen(false)}
+              className="p-2 bg-gray-800 hover:bg-gray-800 rounded-lg mb-4"
+            >
               <X className="h-5 w-5 text-white " />
             </button>
 
@@ -178,21 +181,7 @@ export default function PlayPredictor() {
             onClick={() => setIsFilterOpen(!isFilterOpen)}
             className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-amber-500 to-pink-500 shadow-2xl hover:from-amber-600 hover:to-pink-600 transition-all"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <line x1="4" x2="20" y1="12" y2="12" />
-              <line x1="4" x2="20" y1="6" y2="6" />
-              <line x1="4" x2="20" y1="18" y2="18" />
-            </svg>
+            <AlignJustify className="h-6 w-6 text-white" />
           </Button>
         </div>
 
