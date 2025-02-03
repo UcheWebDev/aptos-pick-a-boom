@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { HeroSlider } from "../components/HeroSlider";
 import MicroBettingBanner from "../components/Banner";
-import StakeSwiper from "../components/StakeSwiper";
-import LeaderboardTable from "../components/LeaderboardTable";
 import FootballBlog from "../components/FootballBlog";
 
 import { toast } from "@/components/ui/use-toast";
@@ -94,9 +91,6 @@ const IndexPage = () => {
           <FootballBlog {...newsData} />
         </div>
         {/* <StakeSwiper newStakes={newStakes} activeStakes={activeStakes} isLoading={isLoading} /> */}
-        <div className="mt-8 mb-8">
-          <LeaderboardTable stakes={newStakes} />
-        </div>
       </div>
     </>
   );

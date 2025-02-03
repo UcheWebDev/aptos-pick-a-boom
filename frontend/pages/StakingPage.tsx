@@ -9,6 +9,7 @@ import {
   DollarSign,
   Aperture,
   Clock,
+  ClipboardCopy,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -20,7 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 // import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,8 @@ import { stakeFunc } from "@/entry-functions/stakeFunc";
 import SpinButton from "@/components/SpinButton";
 import FixturesSelection from "@/components/FixturesSelection";
 import { formatStakeAmount } from "@/utils/stakeUtils";
+import { formatMatchesTimestamp } from "@/utils/formatter";
+import { CountryFlag } from "@/components/CountryFlag";
 
 const presetAmounts = [1, 5, 10, 15];
 const cutPresets = [
@@ -74,27 +77,22 @@ export default function BettingForm() {
   const [matches, setMatches] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
   const [isBettingFormOpen, setIsBettingFormOpen] = useState(false);
+  const [isLeagueDialogOpen, setIsLeagueDialogOpen] = useState(false);
 
   const [isLoading, setisLoading] = useState(false);
   const [isFetching, setisFetching] = useState(true);
-
-  const [matchesCount, setMatchesCount] = useState<number>(0);
-  const [matchesLoading, setMatchesLoading] = useState(false);
-  const [fetchMatchesError, setFetchMatchesError] = useState(null);
-  const [todaysMatches, setTodaysMatches] = useState([]);
+  const [leagues, setLeagues] = useState([{ id: "all", name: "All", leagueName: "" }]);
   const [selectedMatches, setSelectedMatches] = useState([]);
-  const [currentSelectedMatches, setCurrentSelectedMatches] = useState([]); // Add this state
-
-  const [isMatchesDialogOpen, setIsMatchesDialogOpen] = useState(false);
+  const [competitions, setCompetitions] = useState([]); // Add this state
+  const [activeCompetition, setActiveCompetition] = useState([]); // Add this state
+  const [originalMatches, setOriginalMatches] = useState([]);
+  const [pairingId, setPairingId] = useState(null);
 
   const [txHash, settxHash] = useState("");
   const [selectedCutPreset, setSelectedCutPreset] = useState<number | null>(0);
   const [selectedMarketType, setSelectedMarketType] = useState("outcome");
 
-  const [selectedTime, setSelectedTime] = useState<string>("");
   const [errors, setErrors] = useState<{ amount?: string; totalGames?: string; time?: string }>({});
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
   const [isProcessingTransaction, setIsProcessingTransaction] = useState(false);
@@ -150,10 +148,6 @@ export default function BettingForm() {
       return usdAmount ? `$${usdAmount.toFixed(2)}` : "...";
     }
     return `${value} APT`;
-  };
-
-  const openMatchesDialog = () => {
-    setIsMatchesDialogOpen(true);
   };
 
   const calculatePotentialWinnings = (baseAmount: number | string): number => {
@@ -290,6 +284,7 @@ export default function BettingForm() {
       setIsSuccessDialogOpen(true);
       setAmount("");
       setTotalGames("");
+      setPairingId(pairId);
       setSelectedMatches([]), setMultiplier(1.5);
       setSelectedCutPreset(0);
     } catch (error) {
@@ -316,32 +311,39 @@ export default function BettingForm() {
     return `${hash.slice(0, 10)}...${hash.slice(-10)}`;
   };
 
-  const isMatchCurrentDate = (matchTime: string, currentDate: Date): boolean => {
-    // Parse match time
-    const [day, month, year] = matchTime.split(" ")[0].split(".");
-    const matchDate = new Date(`${year}-${month}-${day}`);
-
-    // Compare date components
-    return (
-      matchDate.getDate() === currentDate.getDate() &&
-      matchDate.getMonth() === currentDate.getMonth() &&
-      matchDate.getFullYear() === currentDate.getFullYear()
-    );
-  };
-
   useEffect(() => {
     const fetchMatches = async () => {
       try {
         const { data, error } = await supabase
           .from("matches")
-          .select("*")
+          .select("*, comp_name")
           .in("ccode", ["Champions League", "Europa League", "England", "Italy", "Spain", "France", "Germany"])
           .eq("finished", false)
           .eq("started", false)
           .eq("cancelled", false);
 
         if (error) throw error;
-        setMatches(data);
+        const processedMatches = data.map((match) => ({
+          ...match,
+          league: match.comp_name || match.ccode,
+          leagueName: match.ccode,
+        }));
+
+        setOriginalMatches(processedMatches);
+        setMatches(processedMatches);
+
+        const uniqueLeagues = Array.from(new Set(processedMatches.map((m) => m.ccode).filter(Boolean)));
+
+        const updatedLeagues = [
+          { id: "all", name: "All", leagueName: "" },
+          ...uniqueLeagues.map((league) => ({
+            id: league,
+            name: league,
+            leagueName: league,
+          })),
+        ];
+
+        setLeagues(updatedLeagues);
       } catch (error) {
         console.error("Error fetching matches:", error);
       } finally {
@@ -352,73 +354,58 @@ export default function BettingForm() {
     fetchMatches();
   }, []);
 
+  // Update the toggleMatchSelection function
   const toggleMatchSelection = (match) => {
     if (selectedMatches.find((m) => m.matchId === match.matchId)) {
       setSelectedMatches((prev) => prev.filter((m) => m.matchId !== match.matchId));
     } else {
       if (selectedMatches.length < 10) {
-        setSelectedMatches((prev) => [...prev, match]);
+        const newSelectedMatches = [...selectedMatches, match];
+        setSelectedMatches(newSelectedMatches);
       }
     }
   };
 
-  const filterMatches = (league) => {
-    setActiveFilter(league);
+  const filterMatches = (leagueId) => {
+    setActiveFilter(leagueId);
+    setActiveCompetition("all");
+
+    // Filter matches by selected league
+    const filteredMatchesResult =
+      leagueId === "all" ? originalMatches : originalMatches.filter((match) => match.ccode === leagueId);
+
+    // Extract unique competitions within the selected league
+    const uniqueCompetitions = Array.from(new Set(filteredMatchesResult.map((m) => m.comp_name).filter(Boolean)));
+
+    const updatedCompetitions = [
+      { id: "all", name: "All" },
+      ...uniqueCompetitions.map((competition) => ({
+        id: competition,
+        name: competition,
+      })),
+    ];
+
+    setCompetitions(updatedCompetitions);
+    setMatches(filteredMatchesResult);
   };
 
-  const leagues = [
-    { id: "all", name: "All" },
-    { id: "Europa League", name: "Europa League" },
-    { id: "Champions League", name: "Champions League" },
-    { id: "England", name: "England" },
-    { id: "Italy", name: "Italy" },
-    { id: "Spain", name: "Spain" },
-    { id: "France", name: "France" },
-    { id: "Germany", name: "Germany" },
-  ];
+  const filterCompetition = (competitionId) => {
+    const newActiveCompetition = activeCompetition === competitionId ? "all" : competitionId;
 
-  const formatMatchTime = (timeString) => {
-    if (!timeString || timeString.length !== 14) {
-      throw new Error("Invalid timestamp format. Expected YYYYMMDDHHMMSS");
+    let filteredMatchesResult = originalMatches;
+
+    // Apply league filter first
+    if (activeFilter !== "all") {
+      filteredMatchesResult = filteredMatchesResult.filter((match) => match.ccode === activeFilter);
     }
 
-    // Parse the input time
-    let hours = parseInt(timeString.substring(8, 10));
-    const minutes = timeString.substring(10, 12);
-    const month = parseInt(timeString.substring(4, 6));
-    const day = parseInt(timeString.substring(6, 8));
-
-    if (hours > 23 || parseInt(minutes) > 59) {
-      throw new Error("Invalid hours or minutes");
+    // Apply competition filter if a specific competition is selected
+    if (newActiveCompetition !== "all") {
+      filteredMatchesResult = filteredMatchesResult.filter((match) => match.comp_name === newActiveCompetition);
     }
 
-    // Apply UTC+1 offset
-    hours = (hours + 1) % 24;
-
-    // Handle DST for Central European Time
-    // DST starts last Sunday in March and ends last Sunday in October
-    const year = parseInt(timeString.substring(0, 4));
-    const date = new Date(year, month - 1, day);
-
-    // Get last Sunday in March
-    const marchLastDay = new Date(year, 2, 31);
-    const marchLastSunday = new Date(year, 2, 31 - marchLastDay.getDay());
-
-    // Get last Sunday in October
-    const octoberLastDay = new Date(year, 9, 31);
-    const octoberLastSunday = new Date(year, 9, 31 - octoberLastDay.getDay());
-
-    const isDST = date >= marchLastSunday && date < octoberLastSunday;
-
-    // If in DST, adjust one more hour
-    if (isDST) {
-      hours = (hours + 1) % 24;
-    }
-
-    // Format with leading zeros
-    const formattedHours = hours.toString().padStart(2, "0");
-
-    return `${formattedHours}:${minutes} (UTC+${isDST ? "02:00" : "01:00"})`;
+    setActiveCompetition(newActiveCompetition);
+    setMatches(filteredMatchesResult);
   };
 
   const placeBetEvent = () => {
@@ -431,15 +418,28 @@ export default function BettingForm() {
     <div className="">
       <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 border border-gray-700">
         {/* Balance Display */}
+
+        <div className="mb-6 overflow-x-auto">
+          <Button
+            onClick={() => setIsLeagueDialogOpen(true)}
+            variant="outline"
+            className="w-full bg-gray-800 text-white border-gray-700 hover:bg-gray-700"
+          >
+            Select League Country
+          </Button>
+        </div>
+
         <div className="mb-6 overflow-x-auto">
           <div className="flex space-x-2 pb-2">
-            {leagues.map((league) => (
+            {competitions.map((league) => (
               <Button
                 key={league.id}
-                onClick={() => filterMatches(league.id)}
-                variant={activeFilter === league.id ? "default" : "outline"}
+                onClick={() => filterCompetition(league.id)}
+                variant={activeCompetition === league.id ? "default" : "outline"}
                 className={`px-4 py-2 rounded-full ${
-                  activeFilter === league.id ? "bg-amber-500 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                  activeCompetition === league.id
+                    ? "bg-amber-500 text-white"
+                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
                 }`}
               >
                 {league.name}
@@ -472,7 +472,9 @@ export default function BettingForm() {
         {!isFetching && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-20">
             {matches
-              .filter((match) => activeFilter === "all" || match.ccode === activeFilter)
+              .filter(
+                (match) => activeFilter === "all" || match.comp_name === activeFilter || match.ccode === activeFilter,
+              )
               .map((match) => (
                 <Card
                   key={match.matchId}
@@ -489,7 +491,8 @@ export default function BettingForm() {
 
                       <span className="text-gray-400 text-sm flex items-center">
                         <Clock className="w-4 h-4 mr-1" />
-                        {formatMatchTime(match.matchTime)}
+                        {/* {match.matchTime} */}
+                        {formatMatchesTimestamp(match.matchTime)}
                       </span>
                     </div>
 
@@ -534,7 +537,7 @@ export default function BettingForm() {
                 </div>
                 <div className="flex justify-between mb-2 text-sm sm:text-base">
                   <span className="text-gray-400">Multiplier:</span>
-                  <span className="text-white font-semibold">{multiplier.toFixed(1)}x</span>
+                  <span className="text-white font-semibold">2x</span>
                 </div>
                 <div className="flex justify-between text-sm sm:text-base">
                   <span className="text-gray-400">Potential Win:</span>
@@ -561,12 +564,13 @@ export default function BettingForm() {
               className="w-full sm:w-1/2 bg-gradient-to-r from-amber-500 to-pink-500 text-white hover:from-amber-600 hover:to-pink-600"
               disabled={isProcessingTransaction}
             >
-              {isLoading ? <SpinButton /> : "Confirm Bet"}
+              {isLoading ? <SpinButton /> : "Proceed"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Success Dialog */}
       {/* Success Dialog */}
       <AlertDialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
         <AlertDialogContent className="w-[95%] p-4 sm:p-6 sm:w-full sm:max-w-md bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl border border-gray-700">
@@ -578,10 +582,24 @@ export default function BettingForm() {
             </div>
             <AlertDialogHeader>
               <AlertDialogTitle className="text-center text-amber-500">Wager Placed!</AlertDialogTitle>
-              <div className="text-center">
+              <div className="text-center space-y-2">
                 <p className="text-sm text-gray-400 mt-1 truncate" title={txHash}>
                   Transaction hash: {truncateHash(txHash)}
                 </p>
+                <div
+                  onClick={() => {
+                    navigator.clipboard.writeText(pairingId);
+                    toast({
+                      title: "Copied",
+                      description: "Pair ID copied to clipboard",
+                      duration: 2000,
+                    });
+                  }}
+                  className="flex items-center justify-center text-sm text-gray-300 hover:text-white cursor-pointer group"
+                >
+                  Pair ID: {pairingId}
+                  <ClipboardCopy className="h-4 w-4 ml-2 text-gray-500 group-hover:text-white" />
+                </div>
               </div>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -735,7 +753,7 @@ export default function BettingForm() {
                 </div>
                 <span className="font-bold text-green-600">{getFormattedPotentialWinnings()}</span>
               </div>
-              <div className="text-xs text-gray-400">*Final payout is 1x of wager amount</div>
+              <div className="text-xs text-gray-400">*Final payout is 2x of wager amount</div>
             </div>
 
             {/* Place Bet Button */}
@@ -768,6 +786,37 @@ export default function BettingForm() {
               Confirm Wager
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* League Selection Dialog */}
+      <Dialog open={isLeagueDialogOpen} onOpenChange={setIsLeagueDialogOpen}>
+        <DialogContent className="w-[95%] max-w-md bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-lg">
+          <DialogHeader>
+            <DialogTitle className="text-amber-500">Select Leagues & Competitions</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+            {leagues
+              .filter((league) => league.id !== "all")
+              .map((league) => (
+                <Button
+                  key={league.id}
+                  onClick={() => {
+                    filterMatches(league.id);
+                    setIsLeagueDialogOpen(false);
+                  }}
+                  variant={activeFilter === league.id ? "default" : "outline"}
+                  className={`w-full justify-start ${
+                    activeFilter === league.id
+                      ? "bg-amber-500 text-white"
+                      : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                  }`}
+                >
+                  <CountryFlag countryName={league.leagueName} size={16} className="mr-2 rounded-sm" />
+                  {league.name}
+                </Button>
+              ))}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
