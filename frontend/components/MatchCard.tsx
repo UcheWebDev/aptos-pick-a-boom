@@ -1,6 +1,7 @@
 import React from "react";
 import { Timer, Check, X } from "lucide-react";
 import { CountryFlag } from "@/components/CountryFlag";
+import { formatMatchesTimestamp } from "@/utils/formatter";
 
 // Updated MatchCard component with better existing selection handling
 const MatchCard = ({ match, marketType, existingSelection, currentSelections, onSelect, result }) => {
@@ -34,7 +35,7 @@ const MatchCard = ({ match, marketType, existingSelection, currentSelections, on
     return (
       <div className="flex items-center text-gray-500 text-sm">
         <Timer className="h-4 w-4 mr-1" />
-        {match.matchTime}
+        {formatMatchesTimestamp(match.matchTime)}
       </div>
     );
   };

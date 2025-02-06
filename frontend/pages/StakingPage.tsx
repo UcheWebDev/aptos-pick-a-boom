@@ -547,7 +547,7 @@ export default function BettingForm() {
                 </div>
               </div>
               <AlertDialogDescription className="text-xs sm:text-sm text-gray-400 text-center">
-                By clicking confirm, you agree to place this wager with the specified parameters.
+                By clicking confirm, you agree to place this wager with the specified parameters and a contract fee of 0.05 APT.
               </AlertDialogDescription>
             </div>
           </AlertDialogHeader>

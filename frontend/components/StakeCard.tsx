@@ -22,6 +22,7 @@ import {
   Crown,
   Dices,
   MousePointerClick,
+  Save,
 } from "lucide-react";
 import Modal from "./Modal";
 import { formatAddress, formatStakeAmount } from "../utils/stakeUtils";
@@ -48,6 +49,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { aptosClient } from "@/utils/aptosClient";
 import { supabase } from "@/lib/supabase";
+import { formatMatchesTimestamp } from "@/utils/formatter";
 
 export function StakeCard({ stake, authorizedUser }) {
   const [isPairDialogOpen, setIsPairDialogOpen] = useState(false);
@@ -366,6 +368,10 @@ export function StakeCard({ stake, authorizedUser }) {
     }
   };
 
+  const handleSave = () => {
+    navigate(`/stake-results/${stake.id}`);
+  };
+
   const isUserAuthorizedToComplete =
     authorizedUser?.address === stake.creator || authorizedUser?.address === stake.pairedWith;
 
@@ -409,14 +415,14 @@ export function StakeCard({ stake, authorizedUser }) {
                   <Crown className="w-4 h-4 text-amber-500" />
                   <span className="text-sm text-gray-400">Pot . Win</span>
                 </div>
-                <span className="text-lg font-semibold text-white">{winningAmount} APT</span>
+                <span className="text-sm font-semibold text-white">{winningAmount} APT</span>
               </div>
               <div>
                 <div className="flex items-center space-x-2 mb-1">
                   <Dices className="w-4 h-4 text-amber-500" />
                   <span className="text-sm text-gray-400">Total Matches</span>
                 </div>
-                <span className="text-lg font-semibold text-white">{stake.total_games}</span>
+                <span className="text-sm font-semibold text-white">{stake.total_games}</span>
               </div>
             </div>
           </div>
@@ -425,12 +431,12 @@ export function StakeCard({ stake, authorizedUser }) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-400">Wager Amount</p>
-                <p className="text-lg font-semibold text-white">{stake.amount} APT</p>
+                <p className="text-sm font-semibold text-white">{stake.amount} APT</p>
               </div>
               <div className="h-8 w-[1px] bg-gray-700"></div>
               <div>
                 <p className="text-sm text-gray-400">Wager Status</p>
-                <p className="text-lg font-semibold text-white">{stake.status}</p>
+                <p className="text-sm font-semibold text-white">{stake.status}</p>
               </div>
             </div>
           </div>
@@ -442,14 +448,14 @@ export function StakeCard({ stake, authorizedUser }) {
               <button className="relative w-full group" onClick={() => setIsDetailsDialogOpen(true)}>
                 <div className="w-full bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group">
                   <Eye className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  <span className="transition-colors"> View Details</span>
+                  <span className="transition-colors text-sm"> View Details</span>
                 </div>
               </button>
 
               <button className="relative w-full group" onClick={() => onUnstakeStake()}>
                 <div className="relative bg-gray-800 text-white rounded-lg border border-amber-500 text-white py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2">
                   <Ban className="w-4 h-4 group-hover:translate-x-1 transition-transform text-amber-400" />
-                  <span className="text-amber-400 transition-colors"> Unstake</span>
+                  <span className="text-amber-400 transition-colors text-sm"> Unstake</span>
                 </div>
               </button>
             </>
@@ -458,14 +464,24 @@ export function StakeCard({ stake, authorizedUser }) {
               <button className="relative w-full group" onClick={() => setIsDetailsDialogOpen(true)}>
                 <div className="w-full bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group">
                   <Eye className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  <span className=" transition-colors"> View </span>
+                  <span className=" transition-colors text-sm"> View </span>
                 </div>
               </button>
+              {!isOpen && isUserAuthorizedToComplete && isCompleted && (
+                <button className="relative w-full group" onClick={handleSave}>
+                  <div className="relative bg-gray-800 text-white rounded-lg border border-amber-500 text-white py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2">
+                    <span className="text-amber-400 transition-colors flex items-center text-sm">
+                      <Save className="h-4 w-4 mr-2" />
+                      Save
+                    </span>
+                  </div>
+                </button>
+              )}
               {isOpen && authorizedUser?.address && authorizedUser?.address !== stake.creator && (
                 <button className="relative w-full group" onClick={handleSubmit}>
                   <div className="relative bg-gray-800 text-white rounded-lg border border-amber-500 text-white py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2">
                     <MousePointerClick className="w-4 h-4 mr-2 text-amber-400" />
-                    <span className="text-amber-400 transition-colors">
+                    <span className="text-amber-400 transition-colors text-sm">
                       {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Pair"}
                     </span>
                   </div>
@@ -474,7 +490,7 @@ export function StakeCard({ stake, authorizedUser }) {
               {isPaired && isUserAuthorizedToComplete && (
                 <button className="relative w-full group" onClick={onCompleteStake} disabled={isCompleting}>
                   <div className="relative bg-gray-800 text-white rounded-lg border border-amber-500 text-white py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2">
-                    <span className="text-amber-400 transition-colors flex items-center">
+                    <span className="text-amber-400 transition-colors flex items-center text-sm">
                       {isCompleting ? (
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
                       ) : (
@@ -507,7 +523,7 @@ export function StakeCard({ stake, authorizedUser }) {
               </div>
             </div>
             <DialogDescription>
-              By clicking confirm, you agree to pair this Wager with the specified amount.
+              By clicking confirm, you agree to pair this Wager with the specified amount and a 0.05 APT contract fee.
             </DialogDescription>
           </div>
           <DialogFooter className="flex flex-row gap-3">
@@ -602,7 +618,7 @@ export function StakeCard({ stake, authorizedUser }) {
                 <div className="space-y-6">
                   {/* Main Info */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-gray-800 p-4 rounded-lg">
+                    <div className="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm text-gray-400">Wager Amount</p>
@@ -610,23 +626,13 @@ export function StakeCard({ stake, authorizedUser }) {
                             {formatStakeAmount(stakeDetails?.stake_amount)} APT
                           </p>
                         </div>
-                        <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
-                          <div className="bg-gray-900 p-2 rounded-lg">
-                            <Coins className="w-5 h-5 text-amber-500" />
-                          </div>
-                        </div>
                       </div>
                     </div>
-                    <div className="bg-gray-800 p-4 rounded-lg">
+                    <div className="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm text-gray-400">Total Picks</p>
                           <p className="text-lg font-semibold text-white">{stakeDetails?.total_picks}</p>
-                        </div>
-                        <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
-                          <div className="bg-gray-900 p-2 rounded-lg">
-                            <Users className="w-5 h-5 text-amber-500" />
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -695,6 +701,8 @@ export function StakeCard({ stake, authorizedUser }) {
                       </div>
                     </div>
                   </div>
+
+                  {/* Save Button */}
                 </div>
               )
             ) : (
@@ -760,7 +768,7 @@ export function StakeCard({ stake, authorizedUser }) {
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm">
                             <div className="flex items-center space-x-2">
                               <Timer className="w-4 h-4 text-gray-400 shrink-0" />
-                              <span className="text-gray-300">{match.matchTime}</span>
+                              <span className="text-gray-300">{formatMatchesTimestamp(match.matchTime)}</span>
                             </div>
                           </div>
 

@@ -29,6 +29,7 @@ export default function MatchBetting() {
   const [isStakeCompleted, setIsStakeCompleted] = useState(false);
   const [marketType, setMarketType] = useState("outcome"); // New state for market type
   const [resultData, setResultData] = useState(null);
+  const [totalPicks, setTotalPicks] = useState(0);
 
   const { connected, account, signAndSubmitTransaction } = useWallet();
   const navigate = useNavigate();
@@ -66,14 +67,72 @@ export default function MatchBetting() {
     setSelections([]); // Clear selections when changing market type
   };
 
-  const getResultText = (prediction: "home" | "draw" | "away", homeTeam: string, awayTeam: string) => {
-    switch (prediction) {
-      case "home":
-        return `${homeTeam} Win`;
-      case "draw":
-        return "Draw";
-      case "away":
-        return `${awayTeam} Win`;
+  const fetchMatchesAndSelections = async () => {
+    try {
+      setLoading(true);
+      const { data: stakeData, error: stakeError } = await supabase
+        .from("stakes")
+        .select("selected_matches, is_completed")
+        .eq("stake_id", Number(id))
+        .single();
+
+      if (stakeError) {
+        throw new Error("Failed to fetch Wager data");
+      }
+
+      if (stakeData?.is_completed) {
+        const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-results`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            stake_id: Number(id),
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to check match results");
+        }
+
+        const result = await response.json();
+        setResultData(result);
+        setIsStakeCompleted(true);
+      }
+
+      // setIsStakeCompleted(!!stakeData?.is_completed);
+
+      if (!stakeData?.selected_matches || !stakeData.selected_matches.length) {
+        setMatches([]);
+        return;
+      }
+
+      const { data: matchesData, error: matchesError } = await supabase
+        .from("matches")
+        .select("*")
+        .in("matchId", stakeData.selected_matches);
+
+      if (matchesError) throw matchesError;
+
+      const { data: selectionsData, error: selectionsError } = await supabase
+        .from("selections")
+        .select("match_id, prediction")
+        .eq("stake_id", Number(id))
+        .eq("address", account?.address)
+        .in(
+          "match_id",
+          matchesData.map((match) => match.matchId),
+        );
+
+      if (selectionsError) throw selectionsError;
+
+      setMatches(matchesData);
+      setExistingSelections(selectionsData || []);
+      setTotalPicks(stakeData.total_picks);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -153,9 +212,9 @@ export default function MatchBetting() {
       });
       setSelections([]);
       setShowPredictionsModal(false);
-
+      fetchMatchesAndSelections();
       // Navigate to bet confirmation or next page
-      navigate("/super-picks");
+      // navigate("/super-picks");
     } catch (error: any) {
       // Show error toast
       toast({
@@ -169,74 +228,6 @@ export default function MatchBetting() {
   };
 
   useEffect(() => {
-    const fetchMatchesAndSelections = async () => {
-      try {
-        setLoading(true);
-        const { data: stakeData, error: stakeError } = await supabase
-          .from("stakes")
-          .select("selected_matches, is_completed")
-          .eq("stake_id", Number(id))
-          .single();
-
-        if (stakeError) {
-          throw new Error("Failed to fetch Wager data");
-        }
-
-        if (stakeData?.is_completed) {
-          const response = await fetch(`https://juipkpvidlthunyyeplg.supabase.co/functions/v1/webhook/check-results`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              stake_id: Number(id),
-            }),
-          });
-
-          if (!response.ok) {
-            throw new Error("Failed to check match results");
-          }
-
-          const result = await response.json();
-          setResultData(result);
-          setIsStakeCompleted(true);
-        }
-
-        // setIsStakeCompleted(!!stakeData?.is_completed);
-
-        if (!stakeData?.selected_matches || !stakeData.selected_matches.length) {
-          setMatches([]);
-          return;
-        }
-
-        const { data: matchesData, error: matchesError } = await supabase
-          .from("matches")
-          .select("*")
-          .in("matchId", stakeData.selected_matches);
-
-        if (matchesError) throw matchesError;
-
-        const { data: selectionsData, error: selectionsError } = await supabase
-          .from("selections")
-          .select("match_id, prediction")
-          .eq("stake_id", Number(id))
-          .eq("address", account?.address)
-          .in(
-            "match_id",
-            matchesData.map((match) => match.matchId),
-          );
-
-        if (selectionsError) throw selectionsError;
-
-        setMatches(matchesData);
-        setExistingSelections(selectionsData || []);
-      } catch (error: any) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (account?.address) {
       fetchMatchesAndSelections();
     }
@@ -444,16 +435,22 @@ export default function MatchBetting() {
               />
             ))}
 
-            <div className="flex flex-wrap items-center justify-end gap-2 w-full mt-10">
-              <button
-                onClick={completeStake}
-                disabled={isCompleting}
-                className="flex items-center justify-center px-4 py-2 bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-lg font-semibold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-50 w-full sm:w-auto"
-              >
-                {isCompleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Trophy className="h-4 w-4 mr-2" />}
-                <span className="whitespace-nowrap">Complete</span>
-              </button>
-            </div>
+            {existingSelections.length && (
+              <div className="flex flex-wrap items-center justify-end gap-2 w-full mt-10">
+                <button
+                  onClick={completeStake}
+                  disabled={isCompleting}
+                  className="flex items-center justify-center px-4 py-2 bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-lg font-semibold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-50 w-full sm:w-auto"
+                >
+                  {isCompleting ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Trophy className="h-4 w-4 mr-2" />
+                  )}
+                  <span className="whitespace-nowrap">Complete</span>
+                </button>
+              </div>
+            )}
           </div>
         )}
 

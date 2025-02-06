@@ -128,34 +128,7 @@ const MatchResults = ({ data }) => {
           </CardContent>
         </Card>
 
-        {/* Buttons container outside the captured area */}
-        <div id="buttons-container" className="mt-6 flex justify-center gap-4">
-          <Link
-            to="/super-picks"
-            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-lg font-semibold hover:from-amber-600 hover:to-pink-600 transition-all duration-300"
-          >
-            <span>Return to Stake Listings</span>
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-
-          <button
-            onClick={handleShare}
-            disabled={isSharing}
-            className="inline-flex items-center px-6 py-3 bg-gray-700 text-white rounded-lg font-semibold hover:bg-gray-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSharing ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                <span>Generating...</span>
-              </>
-            ) : (
-              <>
-                <Share2 className="mr-2 h-4 w-4" />
-                <span>Share Results</span>
-              </>
-            )}
-          </button>
-        </div>
+        
       </div>
     </div>
   );

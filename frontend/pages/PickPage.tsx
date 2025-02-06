@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useQuery } from "@tanstack/react-query";
-import { Globe, Unlock, UserRound, ListStart, X, AlignJustify } from "lucide-react";
+import { Globe, Unlock, UserRound, ListStart, X, AlignJustify, SearchX } from "lucide-react";
 import { useParams } from "react-router-dom";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -70,7 +70,7 @@ export default function PlayPredictor() {
     const parsedStakes = Array.isArray(stakes) ? stakes.map(parseStakeData) : [];
     switch (activeTab) {
       case "all":
-        return parsedStakes;
+        return parsedStakes.filter((stake) => stake.status === "Open" || stake.status === "Paired");
       case "my_open":
         return parsedStakes.filter((stake) => account && stake.creator === account.address && stake.status === "Open");
       case "open":
@@ -231,7 +231,14 @@ export default function PlayPredictor() {
 
             {/* No Results State */}
             {finalFilteredStakes.length === 0 && (
-              <div className="text-center py-8 text-gray-500">No stakes found matching your filters.</div>
+              <div className="flex flex-col items-center justify-center py-16 px-4">
+                <SearchX className="w-16 h-16 text-gray-700 mb-4" />
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">No Wagers Found</h3>
+                <p className="text-gray-500 text-center text-sm max-w-sm">
+                  We couldn't find any wagers matching your current filters. Try adjusting your search criteria or
+                  creating a new wager.
+                </p>
+              </div>
             )}
           </>
         )}

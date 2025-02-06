@@ -14,6 +14,12 @@ const StakeResultsPage = () => {
   const { id } = useParams();
   const { account } = useWallet();
 
+  const getUserRole = (userAddress: string, stake: any) => {
+    if (userAddress === stake.creator_addr) return "Wg";
+    if (userAddress === stake.pairer_addr) return "Pr";
+    return null;
+  };
+
   useEffect(() => {
     const fetchStakeData = async () => {
       try {
@@ -67,11 +73,28 @@ const StakeResultsPage = () => {
     return <div className="min-h-screen bg-gray-900 flex justify-center items-center text-white">Stake not found</div>;
   }
 
+  if (!stake.is_completed) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex justify-center items-center text-white">Stake not completed</div>
+    );
+  }
+
+  const isAuthorized = account?.address === stake.creator_addr || account?.address === stake.pairer_addr;
+  const stakeType = getUserRole(account?.address, stake);
+
   // Handle no account
   if (!account?.address) {
     return (
       <div className="min-h-screen bg-gray-900 flex justify-center items-center text-white">
         Please connect your wallet
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex justify-center items-center text-white">
+        You are not authorized to view this stake
       </div>
     );
   }
@@ -97,10 +120,12 @@ const StakeResultsPage = () => {
 
       <StakeResults
         isWon={stake.winner_addr === account.address}
+        address={account.address}
         amount={stake.stake_amount}
         matches={stake.selected_matches || []}
         date={new Date(stake.created_at).toLocaleDateString()}
         totalSelectedMatches={stake.selected_matches?.length || 0}
+        stType={stakeType}
       />
     </div>
   );

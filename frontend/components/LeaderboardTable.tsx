@@ -67,11 +67,11 @@ const LeaderboardTable = ({ stakes = [] }) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
-          <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
+          {/* <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
             <div className="bg-gray-900 p-2 rounded-lg">
               <TrendingUp className="w-5 h-5 text-amber-500" />
             </div>
-          </div>
+          </div> */}
           <div>
             <h3 className="text-lg font-semibold text-white">Top Winners</h3>
             <p className="text-sm text-gray-400">Global Leaderboard</p>
