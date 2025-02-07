@@ -4,6 +4,7 @@ import { toPng } from "html-to-image";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { formatStakeAmount } from "./Banner";
 import { formatAddress } from "@/utils/stakeUtils";
+import QRCodeGenerator from "./QRCodeGenerator";
 
 interface WagerCompletedProps {
   isWon: boolean;
@@ -56,10 +57,10 @@ const StakeResults: React.FC<WagerCompletedProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-76px)] text-white">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-76px)] text-white ">
       <div ref={resultCardRef}>
         {/* Header */}
-        <header className="flex justify-between items-center p-4 ">
+        <header className="flex justify-between items-center p-4 bg-dark">
           <div className="flex items-center">
             <span className="text-amber-500 text-2xl font-bold">PickABoom</span>
           </div>
@@ -82,7 +83,7 @@ const StakeResults: React.FC<WagerCompletedProps> = ({
             </div>
 
             {/* Profit Percentage */}
-            <div className={`${isWon ? "text-emerald-400" : "text-red-400"} text-6xl font-bold mb-8`}>
+            <div className={`${isWon ? "text-emerald-400" : "text-red-400"} text-2xl font-bold mb-8`}>
               {isWon ? "+" : "-"}
               {isWon ? amt : formatStakeAmount(amount)} APT
             </div>
@@ -91,7 +92,7 @@ const StakeResults: React.FC<WagerCompletedProps> = ({
             <div className="space-y-4 mb-8">
               <div className="flex justify-between text-gray-400">
                 <span>Amount Staked</span>
-                <span className="text-white">{formatStakeAmount(amount)} APT</span>
+                <span className="text-white text-sm">{formatStakeAmount(amount)} APT</span>
               </div>
               <div className="flex justify-between text-gray-400">
                 <span>Total Matches</span>
@@ -106,13 +107,14 @@ const StakeResults: React.FC<WagerCompletedProps> = ({
             {/* Referral Section */}
             <div className="bg-gray-900/50 rounded-lg p-4 mt-8">
               <div className="flex items-start gap-4">
-                <QrCode className="w-24 h-24 text-white" />
+                {/* <QrCode className="w-24 h-24 text-white" /> */}
+                <QRCodeGenerator url="https://pickaboom.xyz" openInNewTab={true} />
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-gray-400">Join us</span>
                     <span className="text-white font-mono">Now</span>
                   </div>
-                  <p className="text-gray-400 text-sm">Stake and claim up to 20,000 APT!</p>
+                  <p className="text-gray-400 text-sm">Wager and claim up to 20,000 APT!</p>
                 </div>
               </div>
             </div>

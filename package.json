@@ -44,6 +44,7 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.2.0",
     "react-flag-kit": "^1.1.1",
+    "react-qr-code": "^2.0.15",
     "react-router-dom": "^6.28.0",
     "react-world-flags": "^1.6.0",
     "swiper": "^11.1.15",
