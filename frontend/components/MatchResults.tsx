@@ -65,10 +65,10 @@ const MatchResults = ({ data }) => {
             >
               <Trophy className={`h-8 w-8 ${isWinner ? "text-amber-500" : "text-gray-400"}`} />
             </div>
-            <CardTitle className="text-2xl font-bold text-white mb-2">
-              {isWinner ? "Congratulations!" : "Stake Complete"}
+            <CardTitle className="text-sm font-bold text-white mb-2">
+              {isWinner ? "Congratulations!" : "Wager Complete"}
             </CardTitle>
-            <p className="text-gray-400">
+            <p className="text-gray-400 text-sm">
               {data.correctPredictions} correct out of {data.totalPredictions} predictions
               {data.requiredPicks && ` (${data.requiredPicks} required to win)`}
             </p>
@@ -92,10 +92,10 @@ const MatchResults = ({ data }) => {
                         <p className="text-white font-medium">{result.actual_scores.awayTeamName}</p>
                       </div>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-xl font-bold text-white">
+                        <span className="text-sm font-bold text-white">
                           {result.actual_scores.home} - {result.actual_scores.away}
                         </span>
-                        <span className="text-sm text-gray-400">Final Score</span>
+                        <span className="text-sm text-gray-400">FT</span>
                       </div>
                       <p className="text-sm text-gray-400 mt-1">
                         Your Prediction:{" "}
@@ -121,7 +121,7 @@ const MatchResults = ({ data }) => {
             <div className="mt-8 flex flex-col items-center space-y-4">
               {data.message && (
                 <div className={`${isWinner ? "bg-amber-500/10" : "bg-gray-700/50"} p-4 rounded-lg text-center w-full`}>
-                  <p className={`${isWinner ? "text-amber-500" : "text-gray-400"} font-semibold`}>{data.message}</p>
+                  <p className={`${isWinner ? "text-amber-500" : "text-gray-400"} font-semibold text-sm`}>{data.message}</p>
                 </div>
               )}
             </div>
