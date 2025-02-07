@@ -91,15 +91,15 @@ const StakeResults: React.FC<WagerCompletedProps> = ({
             {/* Price Info */}
             <div className="space-y-4 mb-8">
               <div className="flex justify-between text-gray-400">
-                <span>Amount Staked</span>
+                <span>Amount</span>
                 <span className="text-white text-sm">{formatStakeAmount(amount)} APT</span>
               </div>
               <div className="flex justify-between text-gray-400">
-                <span>Total Matches</span>
+                <span>Matches</span>
                 <span className="text-white">{totalSelectedMatches}</span>
               </div>
               <div className="flex justify-between text-gray-400">
-                <span>Time shared:</span>
+                <span>Time</span>
                 <span className="text-white">{date}</span>
               </div>
             </div>
@@ -111,7 +111,7 @@ const StakeResults: React.FC<WagerCompletedProps> = ({
                 <QRCodeGenerator url="https://pickaboom.xyz" openInNewTab={true} />
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-gray-400">Join us</span>
+                    <span className="text-gray-400">Join</span>
                     <span className="text-white font-mono">Now</span>
                   </div>
                   <p className="text-gray-400 text-sm">Wager and claim up to 20,000 APT!</p>
