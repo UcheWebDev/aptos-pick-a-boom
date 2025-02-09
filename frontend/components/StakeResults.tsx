@@ -92,7 +92,7 @@ const StakeResults: React.FC<WagerCompletedProps> = ({
             <div className="space-y-4 mb-8">
               <div className="flex justify-between text-gray-400">
                 <span>Amount</span>
-                <span className="text-white text-sm">{formatStakeAmount(amount)} APT</span>
+                <span className="text-white text-xs">{formatStakeAmount(amount)} APT</span>
               </div>
               <div className="flex justify-between text-gray-400">
                 <span>Matches</span>

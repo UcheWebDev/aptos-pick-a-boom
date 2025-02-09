@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Timer,
   MapPin,
+  ListChecks,
   Crown,
   Dices,
   MousePointerClick,
@@ -387,122 +388,166 @@ export function StakeCard({ stake, authorizedUser }) {
 
   return (
     <div className="">
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 border border-gray-700">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-3">
-            <div className="bg-gradient-to-r from-amber-500 to-pink-500 p-0.5 rounded-lg">
-              <div className="bg-gray-900 p-2 rounded-lg">
-                <CircuitBoard className="w-5 h-5 text-amber-500" />
+      <div className="relative group">
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500 to-pink-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
+        <div className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 rounded-xl p-6 shadow-2xl backdrop-blur-xl border border-gray-800/50">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-br from-amber-500 to-pink-500 p-0.5 rounded-xl shadow-lg shadow-amber-500/20">
+                <div className="bg-gray-900 p-2.5 rounded-xl">
+                  <CircuitBoard className="w-5 h-5 text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-pink-500" />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300">
+                  {formatAddress(stake.creator)}
+                </h3>
+                <p className="text-sm text-gray-400 mt-0.5">Staker</p>
               </div>
             </div>
-            <div>
-              <h3 className="text-base sm:text-lg font-semibold text-white"> {formatAddress(stake.creator)}</h3>
-              <p className="text-sm text-gray-400">Staker</p>
+            <div className="flex items-center gap-2 bg-emerald-400/10 px-4 py-2 rounded-xl border border-emerald-400/20">
+              <span className="text-emerald-400 font-mono text-sm tracking-tight">{stake.pair_id}</span>
             </div>
           </div>
-          <div className="bg-green-400/10 px-3 py-1 rounded-full">
-            <span className="text-green-400 font-medium text-sm">{stake.pair_id}</span>
-          </div>
-        </div>
 
-        {/* Stats */}
-        <div className="space-y-4 mb-6">
-          <div className="bg-gray-800/50 rounded-lg p-4">
+          {/* Stats Grid */}
+          <div className="space-y-4 mb-6">
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="flex items-center space-x-2 mb-1">
+              <div className="bg-gradient-to-br from-gray-800/50 to-gray-800/30 rounded-xl p-4 backdrop-blur-xl border border-gray-700/30">
+                <div className="flex items-center gap-2 mb-2">
                   <Crown className="w-4 h-4 text-amber-500" />
-                  <span className="text-sm text-gray-400">Pot . Win</span>
+                  <span className="text-sm text-gray-400 font-medium">Pot Win</span>
                 </div>
-                <span className="text-sm font-semibold text-white">{winningAmount} APT</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-lg font-bold text-white">{winningAmount}</span>
+                  <span className="text-sm font-medium text-amber-500">APT</span>
+                </div>
               </div>
-              <div>
-                <div className="flex items-center space-x-2 mb-1">
+
+              <div className="bg-gradient-to-br from-gray-800/50 to-gray-800/30 rounded-xl p-4 backdrop-blur-xl border border-gray-700/30">
+                <div className="flex items-center gap-2 mb-2">
                   <Dices className="w-4 h-4 text-amber-500" />
-                  <span className="text-sm text-gray-400">Total Matches</span>
+                  <span className="text-sm text-gray-400 font-medium">Total Matches</span>
                 </div>
-                <span className="text-sm font-semibold text-white">{stake.total_games}</span>
+                <span className="text-lg font-bold text-white">{stake.total_games}</span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-800/30 rounded-xl p-4 backdrop-blur-xl border border-gray-700/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-400 font-medium mb-1">Wager Amount</p>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-lg font-bold text-white">{stake.amount}</span>
+                    <span className="text-sm font-medium text-amber-500">APT</span>
+                  </div>
+                </div>
+                <div className="h-12 w-px bg-gradient-to-b from-transparent via-gray-700/50 to-transparent"></div>
+                <div>
+                  <p className="text-sm text-gray-400 font-medium mb-1">Status</p>
+                  <div className="inline-flex items-center px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/20">
+                    <span className="text-sm font-semibold text-amber-400">{stake.status}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-gray-800/50 rounded-lg p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-400">Wager Amount</p>
-                <p className="text-sm font-semibold text-white">{stake.amount} APT</p>
-              </div>
-              <div className="h-8 w-[1px] bg-gray-700"></div>
-              <div>
-                <p className="text-sm text-gray-400">Wager Status</p>
-                <p className="text-sm font-semibold text-white">{stake.status}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex gap-2 pt-2 mt-6">
-          {isUserAuthorizedToComplete && !isPaired && !isCompleted ? (
-            <>
-              <button className="relative w-full group" onClick={() => setIsDetailsDialogOpen(true)}>
-                <div className="w-full bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group">
-                  <Eye className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  <span className="transition-colors text-sm"> View Details</span>
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-2">
+            {isUserAuthorizedToComplete && !isPaired && !isCompleted ? (
+              <>
+                {/* <button
+                onClick={() => setIsDetailsDialogOpen(true)}
+                className="flex-1 group relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 transition-all duration-300 group-hover:opacity-90"></div>
+                <div className="relative px-4 py-3 flex items-center justify-center gap-2">
+                  <Eye className="w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform" />
+                  <span className="text-sm font-semibold text-white">View Details</span>
                 </div>
-              </button>
-
-              <button className="relative w-full group" onClick={() => onUnstakeStake()}>
-                <div className="relative bg-gray-800 text-white rounded-lg border border-amber-500 text-white py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2">
-                  <Ban className="w-4 h-4 group-hover:translate-x-1 transition-transform text-amber-400" />
-                  <span className="text-amber-400 transition-colors text-sm"> Unstake</span>
-                </div>
-              </button>
-            </>
-          ) : (
-            <>
-              <button className="relative w-full group" onClick={() => setIsDetailsDialogOpen(true)}>
-                <div className="w-full bg-gradient-to-r from-amber-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:from-amber-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-2 group">
-                  <Eye className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  <span className=" transition-colors text-sm"> View </span>
-                </div>
-              </button>
-              {!isOpen && isUserAuthorizedToComplete && isCompleted && (
-                <button className="relative w-full group" onClick={handleSave}>
-                  <div className="relative bg-gray-800 text-white rounded-lg border border-amber-500 text-white py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2">
-                    <span className="text-amber-400 transition-colors flex items-center text-sm">
-                      <Save className="h-4 w-4 mr-2" />
-                      Save
-                    </span>
+              </button> */}
+                <button
+                  onClick={() => setIsDetailsDialogOpen(true)}
+                  className="flex-1 group relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-500 to-pink-500 p-[1px]"
+                >
+                  <div className="relative h-full bg-gray-900 rounded-[11px] px-4 py-3 flex items-center justify-center gap-2 group-hover:bg-gray-900/95 transition-colors">
+                    <Eye className="w-4 h-4 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+                    <span className="text-sm font-semibold text-amber-400">View</span>
                   </div>
                 </button>
-              )}
-              {isOpen && authorizedUser?.address && authorizedUser?.address !== stake.creator && (
-                <button className="relative w-full group" onClick={handleSubmit}>
-                  <div className="relative bg-gray-800 text-white rounded-lg border border-amber-500 text-white py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2">
-                    <MousePointerClick className="w-4 h-4 mr-2 text-amber-400" />
-                    <span className="text-amber-400 transition-colors text-sm">
-                      {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Pair"}
-                    </span>
+
+                <button onClick={onUnstakeStake} className="flex-1 relative overflow-hidden">
+                  <div className="px-4 py-3 flex items-center justify-center gap-2 bg-gray-800 border border-amber-500/50 rounded-xl hover:bg-gray-800/80 transition-colors">
+                    <Ban className="w-4 h-4 text-amber-400" />
+                    <span className="text-sm font-semibold text-amber-400">Unstake</span>
                   </div>
                 </button>
-              )}
-              {isPaired && isUserAuthorizedToComplete && (
-                <button className="relative w-full group" onClick={onCompleteStake} disabled={isCompleting}>
-                  <div className="relative bg-gray-800 text-white rounded-lg border border-amber-500 text-white py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2">
-                    <span className="text-amber-400 transition-colors flex items-center text-sm">
-                      {isCompleting ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setIsDetailsDialogOpen(true)}
+                  className="flex-1 group relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-500 to-pink-500 p-[1px]"
+                >
+                  <div className="relative h-full bg-gray-900 rounded-[11px] px-4 py-3 flex items-center justify-center gap-2 group-hover:bg-gray-900/95 transition-colors">
+                    <Eye className="w-4 h-4 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+                    <span className="text-sm font-semibold text-amber-400">View</span>
+                  </div>
+                </button>
+
+                {!isOpen && isUserAuthorizedToComplete && isCompleted && (
+                  <button
+                    onClick={handleSave}
+                    className="flex-1 relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-500 to-pink-500 p-[1px]"
+                  >
+                    <div className="relative h-full bg-gray-900 rounded-[11px] px-4 py-3 flex items-center justify-center gap-2 hover:bg-gray-900/95 transition-colors">
+                      <Save className="w-4 h-4 text-amber-400" />
+                      <span className="text-sm font-semibold text-amber-400">Save</span>
+                    </div>
+                  </button>
+                )}
+
+                {isOpen && authorizedUser?.address && authorizedUser.address !== stake.creator && (
+                  <button
+                    onClick={handleSubmit}
+                    className="flex-1 relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-500 to-pink-500 p-[1px]"
+                  >
+                    <div className="relative h-full bg-gray-900 rounded-[11px] px-4 py-3 flex items-center justify-center gap-2 hover:bg-gray-900/95 transition-colors">
+                      {isLoading ? (
+                        <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
                       ) : (
-                        <Trophy className="h-4 w-4 mr-2" />
+                        <>
+                          <MousePointerClick className="w-4 h-4 text-amber-400" />
+                          <span className="text-sm font-semibold text-amber-400">Pair</span>
+                        </>
                       )}
-                      Complete
-                    </span>
-                  </div>
-                </button>
-              )}
-            </>
-          )}
+                    </div>
+                  </button>
+                )}
+
+                {isPaired && isUserAuthorizedToComplete && (
+                  <button
+                    onClick={onCompleteStake}
+                    disabled={isCompleting}
+                    className="flex-1 relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-500 to-pink-500 p-[1px]"
+                  >
+                    <div className="relative h-full bg-gray-900 rounded-[11px] px-4 py-3 flex items-center justify-center gap-2 hover:bg-gray-900/95 transition-colors">
+                      {isCompleting ? (
+                        <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
+                      ) : (
+                        <>
+                          <Trophy className="w-4 h-4 text-amber-400" />
+                          <span className="text-sm font-semibold text-amber-400">Complete</span>
+                        </>
+                      )}
+                    </div>
+                  </button>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -566,16 +611,21 @@ export function StakeCard({ stake, authorizedUser }) {
         </DialogContent>
       </Dialog>
 
-      {/* wager Information */}
+      {/* Wager Information Dialog */}
       <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-        <DialogContent className="w-[95%] max-h-[90vh] overflow-y-auto bg-gray-900 rounded-md border border-gray-700">
-          <DialogHeader className="p-4 sm:p-6 border-b border-gray-700">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
-              <DialogTitle className="text-gray-100 uppercase font-semibold">Wager Information</DialogTitle>
-              <div className="flex space-x-2 sm:space-x-4 w-full sm:w-auto">
+        <DialogContent className="w-[95%] max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-950 rounded-xl border border-gray-800/50 shadow-2xl">
+          <DialogHeader className="p-6 border-b border-gray-800/50">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-1 bg-amber-500 rounded-full" />
+                <DialogTitle className="text-xl text-gray-100 font-bold tracking-tight">Wager Information</DialogTitle>
+              </div>
+              <div className="flex gap-2 w-full sm:w-auto bg-gray-800/50 p-1 rounded-full">
                 <button
-                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-full transition-colors font-bold text-sm ${
-                    activeTab === "details" ? "bg-amber-500 text-white" : "text-gray-400 hover:text-white"
+                  className={`flex-1 sm:flex-none px-4 py-2 rounded-full transition-all duration-200 font-medium text-sm ${
+                    activeTab === "details"
+                      ? "bg-amber-500 text-white shadow-lg"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
                   onClick={() => setActiveTab("details")}
                 >
@@ -583,8 +633,10 @@ export function StakeCard({ stake, authorizedUser }) {
                 </button>
                 {!isLoadingDetails && !stakeDetails?.is_completed && (
                   <button
-                    className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-full transition-colors font-bold text-sm ${
-                      activeTab === "matches" ? "bg-amber-500 text-white" : "text-gray-400 hover:text-white"
+                    className={`flex-1 sm:flex-none px-4 py-2 rounded-full transition-all duration-200 font-medium text-sm ${
+                      activeTab === "matches"
+                        ? "bg-amber-500 text-white shadow-lg"
+                        : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                     }`}
                     onClick={() => setActiveTab("matches")}
                   >
@@ -595,70 +647,75 @@ export function StakeCard({ stake, authorizedUser }) {
             </div>
           </DialogHeader>
 
-          <div className="p-4 sm:p-6">
+          <div className="p-6">
             {activeTab === "details" ? (
               isLoadingDetails ? (
-                <div className="space-y-6">
-                  {/* Loading states */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-gray-800 p-4 rounded-lg animate-pulse h-24" />
-                    <div className="bg-gray-800 p-4 rounded-lg animate-pulse h-24" />
+                <div className="space-y-8">
+                  {/* Loading states with smoother animations */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="bg-gray-800/50 p-6 rounded-xl animate-pulse h-32" />
+                    <div className="bg-gray-800/50 p-6 rounded-xl animate-pulse h-32" />
                   </div>
-                  <div className="space-y-4">
-                    <div className="h-4 bg-gray-800 rounded animate-pulse w-24" />
+                  <div className="space-y-6">
+                    <div className="h-5 bg-gray-800/50 rounded-full animate-pulse w-32" />
                     <div className="space-y-4">
-                      <div className="h-12 bg-gray-800 rounded animate-pulse" />
-                      <div className="h-12 bg-gray-800 rounded animate-pulse" />
-                      <div className="h-12 bg-gray-800 rounded animate-pulse" />
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="h-16 bg-gray-800/50 rounded-xl animate-pulse" />
+                      ))}
                     </div>
                   </div>
-                  <div className="bg-gray-800 p-4 rounded-lg animate-pulse h-16" />
                 </div>
               ) : (
-                <div className="space-y-6">
-                  {/* Main Info */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors">
-                      <div className="flex items-center justify-between">
+                <div className="space-y-8">
+                  {/* Main Stats Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="group bg-gray-800/30 hover:bg-gray-800/50 p-6 rounded-xl transition-all duration-200 border border-gray-700/50">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 bg-amber-500/10 rounded-lg group-hover:scale-110 transition-transform duration-200">
+                          <Coins className="w-6 h-6 text-amber-500" />
+                        </div>
                         <div>
-                          <p className="text-sm text-gray-400">Wager Amount</p>
-                          <p className="text-lg font-semibold text-white">
+                          <p className="text-sm font-medium text-gray-400">Wager Amount</p>
+                          <p className="text-2xl font-bold text-white mt-1">
                             {formatStakeAmount(stakeDetails?.stake_amount)} APT
                           </p>
                         </div>
                       </div>
                     </div>
-                    <div className="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors">
-                      <div className="flex items-center justify-between">
+                    <div className="group bg-gray-800/30 hover:bg-gray-800/50 p-6 rounded-xl transition-all duration-200 border border-gray-700/50">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 bg-amber-500/10 rounded-lg group-hover:scale-110 transition-transform duration-200">
+                          <ListChecks className="w-6 h-6 text-amber-500" />
+                        </div>
                         <div>
-                          <p className="text-sm text-gray-400">Total Picks</p>
-                          <p className="text-lg font-semibold text-white">{stakeDetails?.total_picks}</p>
+                          <p className="text-sm font-medium text-gray-400">Total Picks</p>
+                          <p className="text-2xl font-bold text-white mt-1">{stakeDetails?.total_picks}</p>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Timeline */}
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-medium text-gray-400">Timeline</h3>
-                    <div className="space-y-4">
-                      <div className="flex items-start space-x-3">
-                        <div className="bg-gray-800 p-1.5 rounded-full">
-                          <CheckCircle className="w-4 h-4 text-green-500" />
+                  {/* Timeline Section */}
+                  <div className="space-y-6">
+                    <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Timeline</h3>
+                    <div className="space-y-6">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0 w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center">
+                          <CheckCircle className="w-5 h-5 text-green-500" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-300">Wager Created</p>
-                          <p className="text-sm text-gray-500">by {formatAddress(stake.creator)}</p>
+                          <p className="text-sm font-semibold text-gray-200">Wager Created</p>
+                          <p className="text-sm text-gray-500 mt-1">by {formatAddress(stake.creator)}</p>
                         </div>
                       </div>
 
                       {stakeDetails?.pairer_addr && (
-                        <div className="flex items-start space-x-3">
-                          <div className="bg-gray-800 p-1.5 rounded-full">
-                            <Users className="w-4 h-4 text-amber-500" />
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0 w-10 h-10 bg-amber-500/10 rounded-full flex items-center justify-center">
+                            <Users className="w-5 h-5 text-amber-500" />
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-300">
+                            <p className="text-sm font-semibold text-gray-200">
                               Paired by {formatAddress(stakeDetails?.pairer_addr)}
                             </p>
                           </div>
@@ -666,12 +723,12 @@ export function StakeCard({ stake, authorizedUser }) {
                       )}
 
                       {stakeDetails?.winner_addr && (
-                        <div className="flex items-start space-x-3">
-                          <div className="bg-gray-800 p-1.5 rounded-full">
-                            <BookCheck className="w-4 h-4 text-green-500" />
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0 w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center">
+                            <Trophy className="w-5 h-5 text-green-500" />
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-300">
+                            <p className="text-sm font-semibold text-gray-200">
                               Winner: {formatAddress(stakeDetails?.winner_addr)}
                             </p>
                           </div>
@@ -680,104 +737,90 @@ export function StakeCard({ stake, authorizedUser }) {
                     </div>
                   </div>
 
-                  {/* Pair ID */}
-                  <div className="bg-gray-800 p-4 rounded-lg">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
-                      <span className="text-sm text-gray-400">Pair ID</span>
-                      <div className="flex items-center gap-2 w-full sm:w-auto">
-                        <code className="bg-gray-700 px-2 py-1 rounded text-sm text-gray-200 flex-1 sm:flex-none overflow-x-auto">
+                  {/* Pair ID Section */}
+                  <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <span className="text-sm font-medium text-gray-400">Pair ID</span>
+                      <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <code className="bg-gray-900/50 px-4 py-2 rounded-lg text-sm text-amber-500 font-mono flex-1 sm:flex-none overflow-x-auto">
                           {stake.pair_id}
                         </code>
                         <button
                           onClick={copyToClipboard}
-                          className="p-1.5 hover:bg-gray-700 rounded-lg transition-colors shrink-0"
+                          className="p-2 hover:bg-gray-700/50 rounded-lg transition-colors"
+                          title={copied ? "Copied!" : "Copy to clipboard"}
                         >
                           {copied ? (
-                            <Check className="h-4 w-4 text-green-500" />
+                            <Check className="h-5 w-5 text-green-500" />
                           ) : (
-                            <Copy className="h-4 w-4 text-gray-400" />
+                            <Copy className="h-5 w-5 text-gray-400" />
                           )}
                         </button>
                       </div>
                     </div>
                   </div>
-
-                  {/* Save Button */}
                 </div>
               )
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {isLoadingMatches
                   ? // Loading state for matches
                     Array.from({ length: 3 }).map((_, index) => (
-                      <div key={index} className="bg-gray-800 rounded-lg overflow-hidden">
-                        {/* Loading League Header */}
-                        <div className="bg-gray-700 px-4 py-2 flex items-center justify-between">
-                          <div className="w-32 h-4 bg-gray-800 rounded animate-pulse" />
-                          <div className="w-24 h-4 bg-gray-800 rounded animate-pulse" />
+                      <div key={index} className="bg-gray-800/30 rounded-xl overflow-hidden animate-pulse">
+                        <div className="bg-gray-800/50 px-6 py-4">
+                          <div className="flex justify-between items-center">
+                            <div className="w-32 h-5 bg-gray-700 rounded-full" />
+                            <div className="w-24 h-5 bg-gray-700 rounded-full" />
+                          </div>
                         </div>
-
-                        {/* Loading Match Details */}
-                        <div className="p-4">
-                          {/* Loading Teams and Score */}
-                          <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 mb-4">
-                            <div className="w-32 h-6 bg-gray-700 rounded animate-pulse" />
-                            <div className="w-8 h-6 bg-gray-700 rounded animate-pulse" />
-                            <div className="w-32 h-6 bg-gray-700 rounded animate-pulse" />
+                        <div className="p-6 space-y-6">
+                          <div className="flex justify-between items-center gap-4">
+                            <div className="w-32 h-6 bg-gray-700 rounded-full" />
+                            <div className="w-8 h-6 bg-gray-700 rounded-full" />
+                            <div className="w-32 h-6 bg-gray-700 rounded-full" />
                           </div>
-
-                          {/* Loading Match Info */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                            <div className="w-40 h-4 bg-gray-700 rounded animate-pulse" />
-                          </div>
-
-                          {/* Loading Prediction */}
-                          <div className="mt-4 flex justify-end">
-                            <div className="w-20 h-6 bg-gray-700 rounded-full animate-pulse" />
-                          </div>
+                          <div className="w-40 h-5 bg-gray-700 rounded-full" />
                         </div>
                       </div>
                     ))
                   : selectedMatches?.map((match) => (
-                      <div key={match.matchId} className="bg-gray-800 rounded-lg overflow-hidden">
+                      <div
+                        key={match.matchId}
+                        className="group bg-gray-800/30 hover:bg-gray-800/40 rounded-xl overflow-hidden transition-all duration-200 border border-gray-700/50"
+                      >
                         {/* League Header */}
-                        <div className="bg-gray-700 px-4 py-2 flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <Trophy className="w-4 h-4 text-amber-500" />
-                            <span className="text-sm font-medium text-gray-300">{match.league}</span>
+                        <div className="bg-gray-800/50 px-6 py-4 flex items-center justify-between border-b border-gray-700/50">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-amber-500/10 rounded-lg">
+                              <Trophy className="w-4 h-4 text-amber-500" />
+                            </div>
+                            <span className="text-sm font-semibold text-gray-200">{match.league}</span>
                           </div>
-                          <span className="text-sm text-gray-400">Match #{match.matchId}</span>
+                          <span className="text-sm text-gray-400 font-medium">Match #{match.matchId}</span>
                         </div>
 
                         {/* Match Details */}
-                        <div className="p-4">
-                          {/* Teams and Score */}
-                          <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 mb-4">
+                        <div className="p-6">
+                          <div className="flex flex-col sm:flex-row justify-between items-center gap-6 mb-6">
                             <div className="text-center sm:flex-1">
-                              <p className="text-white font-semibold">{match.homeTeam}</p>
+                              <p className="text-lg font-bold text-white group-hover:text-amber-500 transition-colors">
+                                {match.homeTeam}
+                              </p>
                             </div>
                             <div className="px-4">
-                              <span className="text-amber-500 font-bold text-lg">vs</span>
+                              <span className="text-amber-500 font-bold text-xl">vs</span>
                             </div>
                             <div className="text-center sm:flex-1">
-                              <p className="text-white font-semibold">{match.awayTeam}</p>
+                              <p className="text-lg font-bold text-white group-hover:text-amber-500 transition-colors">
+                                {match.awayTeam}
+                              </p>
                             </div>
                           </div>
 
-                          {/* Match Info */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm">
-                            <div className="flex items-center space-x-2">
-                              <Timer className="w-4 h-4 text-gray-400 shrink-0" />
-                              <span className="text-gray-300">{formatMatchesTimestamp(match.matchTime)}</span>
-                            </div>
+                          <div className="flex items-center gap-3 text-sm">
+                            <Timer className="w-4 h-4 text-amber-500" />
+                            <span className="text-gray-300 font-medium">{formatMatchesTimestamp(match.matchTime)}</span>
                           </div>
-
-                          {/* Prediction */}
-                          {/* <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
-                            <div className="bg-gray-700 px-3 py-1 rounded-full">
-                              <span className="text-amber-500 font-semibold">@ {match.matchTime}</span>
-                            </div>
-                          </div> */}
                         </div>
                       </div>
                     ))}
